@@ -10,7 +10,7 @@ import { cn } from '@/utils/cn';
 import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
 import { mockFixtures, mockTopLeagues } from '@/data/mock';
-import { API_CONFIG } from '@/config/api';
+// Removed unused import
 import { Pin } from 'lucide-react';
 
 // API endpoints would be used here in production

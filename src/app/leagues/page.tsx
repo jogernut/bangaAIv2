@@ -7,8 +7,8 @@ import DatePicker from '@/components/ui/DatePicker';
 import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
 import { mockFixtures, getUniqueLeagues } from '@/data/mock';
-import { sortLeaguesByPriority } from '@/config/priorities';
-import { API_CONFIG } from '@/config/api';
+// import { sortLeaguesByPriority } from '@/config/priorities'; // Will be used for sorting
+// Removed unused import
 import Link from 'next/link';
 
 // API endpoints would be used here in production
@@ -18,7 +18,7 @@ export default function LeaguesPage() {
 
   // Get all unique leagues from fixtures
   const allLeaguesData = getUniqueLeagues(mockFixtures);
-  const allLeagueNames = allLeaguesData.map(l => l.league);
+  // const allLeagueNames = allLeaguesData.map(l => l.league); // Will be used for sorting
   // const sortedLeagues = sortLeaguesByPriority(allLeagueNames); // Will be used when implementing sorting
 
   // Group leagues by country
