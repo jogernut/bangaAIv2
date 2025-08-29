@@ -41,7 +41,7 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
       </div>
 
       {/* Container with proper site-wide padding */}
-      <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-12">
+      <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
         
               {/* Main Content Area */}
       <div className="flex min-h-[calc(100vh-80px)]">
@@ -76,8 +76,8 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
             </main>
           </div>
           
-          {/* Right Panel - Ads (Hidden on mobile/tablet) */}
-          <div className="hidden xl:block w-64 flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800">
+          {/* Right Panel - Ads (Hidden on mobile, visible from large screens) */}
+          <div className="hidden lg:block w-80 flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800">
             <RightPanel />
           </div>
         </div>
