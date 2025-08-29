@@ -26,13 +26,17 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
       {/* Top Menu */}
       <TopMenu />
       
-      {/* Mobile Menu Button - Top Right */}
+      {/* Mobile Menu Button - Top Right (Transforms to Close) */}
       <div className="lg:hidden fixed top-4 right-4 z-50">
         <button
-          onClick={() => setIsLeftPanelOpen(true)}
-          className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-lg border border-gray-300 dark:border-gray-700 transition-colors shadow-lg"
+          onClick={() => setIsLeftPanelOpen(!isLeftPanelOpen)}
+          className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-lg border border-gray-300 dark:border-gray-700 transition-all duration-200 shadow-lg"
         >
-          <Menu className="h-5 w-5 text-gray-900 dark:text-white" />
+          {isLeftPanelOpen ? (
+            <X className="h-5 w-5 text-gray-900 dark:text-white" />
+          ) : (
+            <Menu className="h-5 w-5 text-gray-900 dark:text-white" />
+          )}
         </button>
       </div>
 
@@ -50,15 +54,7 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
             "lg:left-0 right-0 lg:right-auto",
             isLeftPanelOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0" // Mobile: slide in/out from right
           )}>
-            {/* Mobile Close Button */}
-            <div className="lg:hidden absolute top-4 left-4 z-50">
-              <button
-                onClick={() => setIsLeftPanelOpen(false)}
-                className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-lg border border-gray-300 dark:border-gray-700 transition-colors"
-              >
-                <X className="h-4 w-4 text-gray-900 dark:text-white" />
-              </button>
-            </div>
+            {/* Close button removed - now handled by main menu button */}
                           <LeftPanel fixtures={mockFixtures} />
           </div>
           

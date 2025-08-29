@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Calendar, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { getAvailableDates } from '@/utils/date';
 import { format, addDays, parseISO } from 'date-fns';
@@ -24,6 +24,15 @@ export default function DatePicker({ selectedDate, onDateChange, className }: Da
     return selectedDate; // Stay on current if at the end
   };
 
+  // Helper function to get the previous available date
+  const getPreviousDate = () => {
+    const currentIndex = availableDates.findIndex(date => date.value === selectedDate);
+    if (currentIndex > 0) {
+      return availableDates[currentIndex - 1].value;
+    }
+    return selectedDate; // Stay on current if at the beginning
+  };
+
   // Helper function to format date for mobile display
   const formatMobileDate = (dateStr: string) => {
     const date = parseISO(dateStr);
@@ -42,18 +51,37 @@ export default function DatePicker({ selectedDate, onDateChange, className }: Da
     }
   };
 
-  const isLastDate = availableDates.findIndex(date => date.value === selectedDate) === availableDates.length - 1;
+  const currentIndex = availableDates.findIndex(date => date.value === selectedDate);
+  const isLastDate = currentIndex === availableDates.length - 1;
+  const isFirstDate = currentIndex === 0;
   
   return (
     <div className={cn("flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2", className)}>
-      {/* Mobile Date Picker: Simple Today + Forward Arrow */}
+      {/* Mobile Date Picker: Back + Today/Tomorrow + Forward Arrow */}
       <div className="md:hidden flex items-center justify-between bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+        {/* Back Button - Only show if not on first date */}
+        <button
+          onClick={() => onDateChange(getPreviousDate())}
+          disabled={isFirstDate}
+          className={cn(
+            "flex items-center justify-center w-8 h-8 rounded-full transition-colors",
+            isFirstDate
+              ? "invisible" // Hide instead of showing disabled state
+              : "bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-500"
+          )}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+
+        {/* Date Display */}
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
           <span className="text-sm font-medium text-gray-900 dark:text-white">
             {formatMobileDate(selectedDate)}
           </span>
         </div>
+
+        {/* Forward Button */}
         <button
           onClick={() => onDateChange(getNextDate())}
           disabled={isLastDate}

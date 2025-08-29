@@ -142,11 +142,13 @@ export default function SearchBox({ className }: SearchBoxProps) {
         
         {query && (
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setQuery('');
               setIsOpen(false);
             }}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition-colors z-10"
           >
             <X className="h-4 w-4" />
           </button>
@@ -155,7 +157,7 @@ export default function SearchBox({ className }: SearchBoxProps) {
 
       {/* Search Results Dropdown */}
       {isOpen && filteredResults.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-600 rounded-lg shadow-xl z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-600 rounded-lg shadow-xl z-20">
           <div className="max-h-80 overflow-hidden">
             {filteredResults.map((result, index) => (
               <button
@@ -203,7 +205,7 @@ export default function SearchBox({ className }: SearchBoxProps) {
 
       {/* No Results */}
       {isOpen && query.trim() && filteredResults.length === 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 text-center">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-lg shadow-lg z-20 p-4 text-center">
           <div className="text-gray-600 dark:text-gray-400">
             No results found for "{query}"
           </div>

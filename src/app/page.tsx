@@ -100,7 +100,7 @@ export default function HomePage() {
             Football Predictions
           </h1>
           <p className="text-sm text-gray-400">
-            AI-powered predictions from multiple providers
+            AI-powered predictions by the best models
           </p>
         </div>
         
