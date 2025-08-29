@@ -20,7 +20,7 @@ export default function TopMenu() {
   
   return (
     <div className="w-full bg-gray-900">
-      <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
+      <div className="max-w-[1600px] mx-auto px-3 md:px-8 lg:px-16">
         <header className="h-20 border-b border-gray-800">
           <div className="flex items-center h-full relative px-6">
             {/* Logo - Left */}

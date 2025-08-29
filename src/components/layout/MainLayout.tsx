@@ -36,7 +36,7 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
       </div>
 
       {/* Container with proper site-wide padding */}
-      <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
+      <div className="max-w-[1600px] mx-auto px-3 md:px-8 lg:px-16">
         
               {/* Main Content Area */}
       <div className="flex min-h-[calc(100vh-80px)]">
