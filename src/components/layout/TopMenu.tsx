@@ -19,9 +19,9 @@ export default function TopMenu() {
   const pathname = usePathname();
   
   return (
-    <div className="w-full">
+    <div className="w-full bg-white dark:bg-gray-900 transition-colors">
       <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
-        <header className="h-20 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 transition-colors">
+        <header className="h-20 border-b border-gray-200 dark:border-gray-800 transition-colors">
           <div className="flex items-center h-full relative px-6">
             {/* Logo - Left */}
             <Link href="/" className="flex items-center py-3">
