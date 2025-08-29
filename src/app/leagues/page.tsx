@@ -15,7 +15,7 @@ import Link from 'next/link';
 const LEAGUES_API = API_CONFIG.ENDPOINTS.HOMEPAGE;
 
 export default function LeaguesPage() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
   // Get all unique leagues from fixtures
   const allLeaguesData = getUniqueLeagues(mockFixtures);
