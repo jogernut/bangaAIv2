@@ -3,13 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import MainLayout from '@/components/layout/MainLayout';
-import { getCountryFlag, getAllCountriesWithFlags } from '@/utils/countries';
+import { getCountryFlag } from '@/utils/countries';
 import { mockCountries, mockFixtures } from '@/data/mock';
-import { buildApiUrl, API_CONFIG } from '@/config/api';
+// Removed unused imports
 import { Search, Globe } from 'lucide-react';
 
-// API Endpoints
-const HOMEPAGE_API = API_CONFIG.ENDPOINTS.HOMEPAGE;
+// API endpoints would be used here in production
 
 export default function CountriesPage() {
   const [searchQuery, setSearchQuery] = useState('');

@@ -207,7 +207,7 @@ export default function SearchBox({ className }: SearchBoxProps) {
       {isOpen && query.trim() && filteredResults.length === 0 && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-lg shadow-lg z-20 p-4 text-center">
           <div className="text-gray-600 dark:text-gray-400">
-            No results found for "{query}"
+            No results found for &quot;{query}&quot;
           </div>
         </div>
       )}

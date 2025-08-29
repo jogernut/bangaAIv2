@@ -9,10 +9,9 @@ import MatchHeader from '@/components/ui/MatchHeader';
 import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
 import { mockFixtures } from '@/data/mock';
-import { API_CONFIG } from '@/config/api';
+// Removed unused import
 
-// API Endpoints
-const LEAGUE_API = API_CONFIG.ENDPOINTS.HOMEPAGE;
+// API endpoints would be used here in production
 
 interface LeaguePageProps {
   params: Promise<{

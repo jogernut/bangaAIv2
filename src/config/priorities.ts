@@ -41,7 +41,7 @@ export const MAX_PRIORITY_COUNTRIES = 8;
 export function sortLeaguesByPriority(leagues: string[]): string[] {
   const prioritySet = new Set(PRIORITY_LEAGUES);
   const priorityLeagues = PRIORITY_LEAGUES.filter(league => leagues.includes(league));
-  const otherLeagues = leagues.filter(league => !prioritySet.has(league as any)).sort();
+  const otherLeagues = leagues.filter(league => !prioritySet.has(league as (typeof PRIORITY_LEAGUES)[number])).sort();
   
   return [...priorityLeagues, ...otherLeagues];
 }
@@ -49,7 +49,7 @@ export function sortLeaguesByPriority(leagues: string[]): string[] {
 export function sortCountriesByPriority(countries: string[]): string[] {
   const prioritySet = new Set(PRIORITY_COUNTRIES);
   const priorityCountries = PRIORITY_COUNTRIES.filter(country => countries.includes(country));
-  const otherCountries = countries.filter(country => !prioritySet.has(country as any)).sort();
+  const otherCountries = countries.filter(country => !prioritySet.has(country as (typeof PRIORITY_COUNTRIES)[number])).sort();
   
   return [...priorityCountries, ...otherCountries];
 }

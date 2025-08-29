@@ -6,7 +6,7 @@ import LeftPanel from './LeftPanel';
 import RightPanel from './RightPanel';
 import TopMenu from './TopMenu';
 import { Menu, X } from 'lucide-react';
-import { mockFixtures, type Fixture } from '@/data/mock';
+import { mockFixtures } from '@/data/mock';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
 interface MainLayoutProps {

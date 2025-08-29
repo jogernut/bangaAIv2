@@ -10,11 +10,10 @@ import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
 import { filterPredictionsByMarket } from '@/utils/markets';
 import { mockFixtures, mockMarkets } from '@/data/mock';
-import { buildApiUrl, API_CONFIG } from '@/config/api';
+// Removed unused imports
 import { TrendingUp } from 'lucide-react';
 
-// API Endpoints
-const MARKETS_API = API_CONFIG.ENDPOINTS.MARKETS;
+// API endpoints would be used here in production
 
 export default function MarketPage() {
   const params = useParams();

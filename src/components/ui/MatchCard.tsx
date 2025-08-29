@@ -5,10 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/utils/cn';
-import { getCountryFlag } from '@/utils/countries';
+// import { getCountryFlag } from '@/utils/countries'; // Will be used for country displays
 import { formatMatchTime } from '@/utils/date';
 import { Fixture, ModelPrediction } from '@/data/mock';
-import { getQualifiedMarkets, getMarketDisplayValue, usesTotalGoalsConfidence } from '@/utils/markets';
+import { getQualifiedMarkets, getMarketDisplayValue } from '@/utils/markets';
 
 interface MatchCardProps {
   fixture: Fixture;

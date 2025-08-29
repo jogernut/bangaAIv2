@@ -17,7 +17,7 @@ interface LeftPanelProps {
 
 export default function LeftPanel({ fixtures }: LeftPanelProps) {
   const pathname = usePathname();
-  const [searchQuery, setSearchQuery] = useState('');
+  // const [searchQuery, setSearchQuery] = useState(''); // Will be used for search functionality
   const [pinnedLeagues, setPinnedLeagues] = useState<string[]>([]);
   
   // Get pinned leagues from session storage on component mount

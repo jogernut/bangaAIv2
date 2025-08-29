@@ -28,7 +28,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // Apply theme immediately
       document.documentElement.classList.remove('light', 'dark');
       document.documentElement.classList.add(initialDarkMode ? 'dark' : 'light');
-    } catch (error) {
+          } catch {
       // Fallback to dark mode if there's an error
       setIsDarkMode(true);
       document.documentElement.classList.add('dark');

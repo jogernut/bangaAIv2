@@ -11,8 +11,7 @@ import { sortLeaguesByPriority } from '@/config/priorities';
 import { API_CONFIG } from '@/config/api';
 import Link from 'next/link';
 
-// API Endpoints
-const LEAGUES_API = API_CONFIG.ENDPOINTS.HOMEPAGE;
+// API endpoints would be used here in production
 
 export default function LeaguesPage() {
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -20,7 +19,7 @@ export default function LeaguesPage() {
   // Get all unique leagues from fixtures
   const allLeaguesData = getUniqueLeagues(mockFixtures);
   const allLeagueNames = allLeaguesData.map(l => l.league);
-  const sortedLeagues = sortLeaguesByPriority(allLeagueNames);
+  // const sortedLeagues = sortLeaguesByPriority(allLeagueNames); // Will be used when implementing sorting
 
   // Group leagues by country
   const leaguesByCountry = allLeaguesData.reduce((acc, { country, league }) => {

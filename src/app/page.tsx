@@ -11,10 +11,9 @@ import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
 import { mockFixtures, mockTopLeagues } from '@/data/mock';
 import { API_CONFIG } from '@/config/api';
-import { Pin, PinOff } from 'lucide-react';
+import { Pin } from 'lucide-react';
 
-// API Endpoints
-const HOMEPAGE_API = API_CONFIG.ENDPOINTS.HOMEPAGE;
+// API endpoints would be used here in production
 
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));

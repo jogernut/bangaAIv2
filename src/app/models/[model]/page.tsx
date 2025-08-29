@@ -9,11 +9,10 @@ import MatchCard from '@/components/ui/MatchCard';
 import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
 import { mockFixtures, mockAiModels } from '@/data/mock';
-import { buildApiUrl, API_CONFIG } from '@/config/api';
+// Removed unused imports
 import { Brain, Bot } from 'lucide-react';
 
-// API Endpoints  
-const HOMEPAGE_API = API_CONFIG.ENDPOINTS.HOMEPAGE;
+// API endpoints would be used here in production
 
 export default function ModelPage() {
   const params = useParams();

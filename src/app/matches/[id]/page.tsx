@@ -9,12 +9,11 @@ import { getCountryFlag } from '@/utils/countries';
 import { formatMatchTime, formatMatchDate } from '@/utils/date';
 import { getQualifiedMarkets, usesTotalGoalsConfidence } from '@/utils/markets';
 import { mockFixtures } from '@/data/mock';
-import { buildApiUrl, API_CONFIG } from '@/config/api';
-import { ArrowLeft, Clock, TrendingUp, Shield, Target } from 'lucide-react';
+// Removed unused imports
+import { ArrowLeft, Clock, TrendingUp, Shield } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
-// API Endpoints
-const MORE_DETAILS_API = API_CONFIG.ENDPOINTS.MORE_DETAILS;
+// API endpoints would be used here in production
 
 export default function MatchDetailsPage() {
   const params = useParams();

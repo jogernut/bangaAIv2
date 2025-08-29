@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, use } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -11,11 +11,10 @@ import MatchHeader from '@/components/ui/MatchHeader';
 import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
 import { mockFixtures } from '@/data/mock';
-import { buildApiUrl, API_CONFIG } from '@/config/api';
+// Removed unused imports
 import { ArrowLeft, Pin, PinOff } from 'lucide-react';
 
-// API Endpoints
-const HOMEPAGE_API = API_CONFIG.ENDPOINTS.HOMEPAGE;
+// API endpoints would be used here in production
 
 export default function CountryPage() {
   const params = useParams();
