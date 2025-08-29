@@ -58,7 +58,7 @@ export default function DatePicker({ selectedDate, onDateChange, className }: Da
   return (
     <div className={cn("flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2", className)}>
       {/* Mobile Date Picker: Back + Today/Tomorrow + Forward Arrow */}
-      <div className="md:hidden flex items-center justify-between bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+      <div className="md:hidden flex items-center justify-between bg-gray-800 rounded-lg p-3">
         {/* Back Button - Only show if not on first date */}
         <button
           onClick={() => onDateChange(getPreviousDate())}
@@ -67,7 +67,7 @@ export default function DatePicker({ selectedDate, onDateChange, className }: Da
             "flex items-center justify-center w-8 h-8 rounded-full transition-colors",
             isFirstDate
               ? "invisible" // Hide instead of showing disabled state
-              : "bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-500"
+              : "bg-gray-600 text-gray-300 hover:bg-gray-500"
           )}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -75,8 +75,8 @@ export default function DatePicker({ selectedDate, onDateChange, className }: Da
 
         {/* Date Display */}
         <div className="flex items-center space-x-2">
-          <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-          <span className="text-sm font-medium text-gray-900 dark:text-white">
+          <Calendar className="h-4 w-4 text-gray-400" />
+          <span className="text-sm font-medium text-white">
             {formatMobileDate(selectedDate)}
           </span>
         </div>
@@ -88,8 +88,8 @@ export default function DatePicker({ selectedDate, onDateChange, className }: Da
           className={cn(
             "flex items-center justify-center w-8 h-8 rounded-full transition-colors",
             isLastDate
-              ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-600 cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              ? "bg-gray-700 text-gray-600 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-600"
           )}
         >
           <ChevronRight className="h-4 w-4" />
@@ -98,9 +98,9 @@ export default function DatePicker({ selectedDate, onDateChange, className }: Da
 
       {/* Desktop Date Picker: Original */}
       <div className="hidden md:flex items-center space-x-2">
-        <Calendar className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+        <Calendar className="h-5 w-5 text-gray-400" />
       </div>
-      <div className="hidden md:flex rounded-lg p-1 overflow-x-auto bg-gray-100 dark:bg-gray-800">
+      <div className="hidden md:flex rounded-lg p-1 overflow-x-auto bg-gray-800">
         {availableDates.map((date) => (
           <button
             key={date.value}
@@ -108,8 +108,8 @@ export default function DatePicker({ selectedDate, onDateChange, className }: Da
             className={cn(
               "px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0",
               selectedDate === date.value
-                ? "bg-white text-gray-900 dark:bg-white dark:text-gray-900"
-                : "text-gray-700 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+                ? "bg-white text-gray-900 bg-white text-gray-900"
+                : "text-gray-700 hover:text-gray-900 hover:bg-gray-200 text-gray-300 hover:text-white hover:bg-gray-700"
             )}
           >
             {date.label}

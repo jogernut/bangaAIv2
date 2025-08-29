@@ -128,11 +128,11 @@ export default function CountryPage() {
             <span className="text-4xl">
               {getCountryFlag(countryName)}
             </span>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-white">
               {countryName} Matches
             </h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400">
             Football predictions from leagues in {countryName}
           </p>
         </div>
@@ -178,7 +178,7 @@ export default function CountryPage() {
                 
                 <button
                   onClick={() => togglePinnedLeague(league)}
-                  className="flex items-center space-x-1 px-3 py-1 rounded-lg transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+                  className="flex items-center space-x-1 px-3 py-1 rounded-lg transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
                 >
                   {pinnedLeagues.includes(league) ? (
                     <>

@@ -7,7 +7,6 @@ import RightPanel from './RightPanel';
 import TopMenu from './TopMenu';
 import { Menu, X } from 'lucide-react';
 import { mockFixtures } from '@/data/mock';
-import { useTheme } from '@/components/providers/ThemeProvider';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -16,13 +15,9 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children, className }: MainLayoutProps) {
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(false);
-  const { isDarkMode } = useTheme();
   
   return (
-    <div className={cn(
-      'min-h-screen transition-colors',
-      isDarkMode ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'
-    )}>
+    <div className="min-h-screen bg-gray-950 text-white">
       {/* Top Menu */}
       <TopMenu />
       
@@ -30,12 +25,12 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
       <div className="lg:hidden fixed top-4 right-4 z-50">
         <button
           onClick={() => setIsLeftPanelOpen(!isLeftPanelOpen)}
-          className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-lg border border-gray-300 dark:border-gray-700 transition-all duration-200 shadow-lg"
+          className="bg-gray-800 hover:bg-gray-700 p-2 rounded-lg border border-gray-700 transition-all duration-200 shadow-lg"
         >
           {isLeftPanelOpen ? (
-            <X className="h-5 w-5 text-gray-900 dark:text-white" />
+            <X className="h-5 w-5 text-white" />
           ) : (
-            <Menu className="h-5 w-5 text-gray-900 dark:text-white" />
+            <Menu className="h-5 w-5 text-white" />
           )}
         </button>
       </div>
@@ -47,7 +42,7 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
       <div className="flex min-h-[calc(100vh-80px)]">
           {/* Left Panel - Navigation & Filters */}
           <div className={cn(
-            "w-56 md:w-64 flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out",
+            "w-56 md:w-64 flex-shrink-0 bg-gray-900 border-r border-gray-800 transition-all duration-300 ease-in-out",
             "lg:translate-x-0", // Always visible on large screens
             "fixed lg:static inset-y-0 lg:left-0 z-40 top-20", // Mobile: fixed overlay
             // Mobile: slide from right side
@@ -76,8 +71,8 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
             </main>
           </div>
           
-          {/* Right Panel - Ads (Hidden on mobile, visible from large screens) */}
-          <div className="hidden lg:block w-80 flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800">
+                   {/* Right Panel - Ads (Hidden on mobile, visible from large screens) */}
+         <div className="hidden lg:block w-80 flex-shrink-0 bg-gray-900 border-l border-gray-800">
             <RightPanel />
           </div>
         </div>

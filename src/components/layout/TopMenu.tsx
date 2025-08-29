@@ -19,9 +19,9 @@ export default function TopMenu() {
   const pathname = usePathname();
   
   return (
-    <div className="w-full bg-white dark:bg-gray-900 transition-colors">
+    <div className="w-full bg-gray-900">
       <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
-        <header className="h-20 border-b border-gray-200 dark:border-gray-800 transition-colors">
+        <header className="h-20 border-b border-gray-800">
           <div className="flex items-center h-full relative px-6">
             {/* Logo - Left */}
             <Link href="/" className="flex items-center py-3">
@@ -47,7 +47,7 @@ export default function TopMenu() {
                       "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap transform hover:scale-105 min-w-[90px] text-center",
                       pathname === model.path
                         ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
-                        : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-800/80"
+                        : "text-gray-300 hover:text-white hover:bg-gray-800/80"
                     )}
                   >
                     {model.name}
