@@ -7,7 +7,7 @@ interface MatchHeaderProps {
 
 export default function MatchHeader({ mode, models = ['Gemini', 'ChatGPT', 'Grok', 'ML'] }: MatchHeaderProps) {
   return (
-    <div className="bg-gray-100/50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-800 rounded-lg p-3 mb-4">
+    <div className="hidden md:block bg-gray-100/50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-800 rounded-lg p-3 mb-4">
       {/* Use same grid as MatchCard for perfect alignment */}
       <div className="grid grid-cols-[50px_1fr_240px_20px] md:grid-cols-[60px_1fr_320px_20px] gap-3 md:gap-6 items-center">
         {/* Time Column */}

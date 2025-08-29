@@ -23,10 +23,8 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
       'min-h-screen transition-colors',
       isDarkMode ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'
     )}>
-      {/* Top Menu - Hidden on mobile */}
-      <div className="hidden lg:block">
-        <TopMenu />
-      </div>
+      {/* Top Menu */}
+      <TopMenu />
       
       {/* Mobile Menu Button - Top Right */}
       <div className="lg:hidden fixed top-4 right-4 z-50">
@@ -42,16 +40,18 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-12">
         
               {/* Main Content Area */}
-      <div className="flex min-h-screen lg:min-h-[calc(100vh-80px)]">
+      <div className="flex min-h-[calc(100vh-80px)]">
           {/* Left Panel - Navigation & Filters */}
           <div className={cn(
             "w-56 md:w-64 flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out",
             "lg:translate-x-0", // Always visible on large screens
-            "fixed lg:static inset-y-0 left-0 z-40 top-0 lg:top-20", // Mobile: fixed overlay
-            isLeftPanelOpen ? "translate-x-0" : "-translate-x-full" // Mobile: slide in/out
+            "fixed lg:static inset-y-0 lg:left-0 z-40 top-20", // Mobile: fixed overlay
+            // Mobile: slide from right side
+            "lg:left-0 right-0 lg:right-auto",
+            isLeftPanelOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0" // Mobile: slide in/out from right
           )}>
             {/* Mobile Close Button */}
-            <div className="lg:hidden absolute top-4 right-4 z-50">
+            <div className="lg:hidden absolute top-4 left-4 z-50">
               <button
                 onClick={() => setIsLeftPanelOpen(false)}
                 className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-lg border border-gray-300 dark:border-gray-700 transition-colors"
@@ -65,7 +65,7 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
           {/* Mobile Overlay */}
           {isLeftPanelOpen && (
             <div 
-              className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 top-16"
+              className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 top-20"
               onClick={() => setIsLeftPanelOpen(false)}
             />
           )}
