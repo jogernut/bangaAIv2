@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Pin, PinOff } from 'lucide-react';
+import { Pin, PinOff, Bot } from 'lucide-react';
 import SearchBox from '@/components/ui/SearchBox';
 import { cn } from '@/utils/cn';
 import { getCountryFlag } from '@/utils/countries';
 import { mockMarkets, getUniqueLeagues, getUniqueCountries, type Fixture } from '@/data/mock';
 import { getTopPriorityLeagues, getTopPriorityCountries } from '@/config/priorities';
+import { API_CONFIG } from '@/config/api';
 
 interface LeftPanelProps {
   fixtures: Fixture[];
@@ -43,6 +44,14 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
   const topLeagues = getTopPriorityLeagues(allLeagues.map(l => l.league));
   const topCountries = getTopPriorityCountries(allCountries);
   
+  // AI Models for mobile navigation
+  const aiModels = [
+    { name: 'Gemini', path: '/models/gemini' },
+    { name: 'ChatGPT', path: '/models/chatgpt' },
+    { name: 'Grok', path: '/models/grok' },
+    { name: 'ML', path: '/models/ml' },
+  ];
+  
   return (
     <div className="h-full flex flex-col">
       {/* Search Box */}
@@ -53,7 +62,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
       <div className="flex-1 overflow-y-auto">
         {/* Top Leagues */}
         <div className="px-4 mb-6">
-          <h3 className="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">
             Top Leagues
           </h3>
           <div className="space-y-1">
@@ -69,7 +78,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
                       "flex-1 flex items-center space-x-2 p-2 rounded-lg text-sm transition-colors",
                       pathname.includes(leagueName.toLowerCase())
                         ? "bg-blue-600/20 text-blue-400"
-                        : "text-gray-300 hover:text-white hover:bg-gray-800"
+                        : "text-gray-700 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
                     )}
                   >
                     <span className="text-lg">
@@ -79,7 +88,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
                   </Link>
                   <button
                     onClick={() => togglePinnedLeague(leagueName)}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-yellow-400 transition-all"
+                    className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-yellow-600 dark:text-gray-400 dark:hover:text-yellow-400 transition-all"
                   >
                     {pinnedLeagues.includes(leagueName) ? (
                       <Pin className="h-3 w-3 fill-current" />
@@ -93,7 +102,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
             {allLeagues.length > topLeagues.length && (
               <Link
                 href="/leagues"
-                className="block p-2 rounded-lg text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                className="block p-2 rounded-lg text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
               >
                 View all leagues →
               </Link>
@@ -103,17 +112,17 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
         
         {/* Ad Slot */}
         <div className="px-4 mb-6">
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
-            <div className="text-xs text-gray-400 mb-2">Advertisement</div>
-            <div className="h-20 bg-gray-700 rounded flex items-center justify-center">
-              <span className="text-xs text-gray-500">Ad Space</span>
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">Advertisement</div>
+            <div className="h-20 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
+              <span className="text-xs text-gray-500 dark:text-gray-500">Ad Space</span>
             </div>
           </div>
         </div>
         
         {/* Markets */}
         <div className="px-4 mb-6">
-          <h3 className="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">
             Markets
           </h3>
           <div className="space-y-1">
@@ -125,7 +134,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
                   "block p-2 rounded-lg text-sm transition-colors",
                   pathname === `/markets/${market.key}`
                     ? "bg-blue-600/20 text-blue-400"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800"
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
                 )}
               >
                 {market.name}
@@ -136,17 +145,51 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
         
         {/* Ad Slot */}
         <div className="px-4 mb-6">
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
-            <div className="text-xs text-gray-400 mb-2">Advertisement</div>
-            <div className="h-20 bg-gray-700 rounded flex items-center justify-center">
-              <span className="text-xs text-gray-500">Ad Space</span>
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">Advertisement</div>
+            <div className="h-20 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
+              <span className="text-xs text-gray-500 dark:text-gray-500">Ad Space</span>
             </div>
+          </div>
+        </div>
+        
+        {/* AI Models - Mobile Only */}
+        <div className="px-4 mb-6 lg:hidden">
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">
+            Models
+          </h3>
+          <div className="space-y-1">
+            {aiModels.map((model) => (
+              <Link
+                key={model.name}
+                href={model.path}
+                className={cn(
+                  "block p-2 rounded-lg text-sm transition-colors",
+                  pathname === model.path
+                    ? "bg-blue-600/20 text-blue-400"
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
+                )}
+              >
+                {model.name}
+              </Link>
+            ))}
+            
+            {/* BangaBot Special Link */}
+            <a
+              href={API_CONFIG.BANGABOT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 p-2 rounded-lg text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800 transition-colors"
+            >
+              <Bot className="h-4 w-4" />
+              <span>BangaBot</span>
+            </a>
           </div>
         </div>
         
         {/* Countries */}
         <div className="px-4 mb-6">
-          <h3 className="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">
             Countries
           </h3>
           <div className="space-y-1">
@@ -158,7 +201,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
                   "flex items-center space-x-2 p-2 rounded-lg text-sm transition-colors",
                   pathname.includes(country.toLowerCase())
                     ? "bg-blue-600/20 text-blue-400"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800"
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
                 )}
               >
                 <span className="text-lg">
@@ -170,7 +213,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
             {allCountries.length > topCountries.length && (
               <Link
                 href="/countries"
-                className="block p-2 rounded-lg text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                className="block p-2 rounded-lg text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
               >
                 View all countries →
               </Link>

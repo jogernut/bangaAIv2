@@ -41,6 +41,8 @@ export default function MatchDetailsPage() {
         const qualifiedMarkets = getQualifiedMarkets(prediction);
         return qualifiedMarkets.some(qm => qm.key === market);
       });
+      // For markets, exclude BangaBot
+      predictions = predictions.filter(p => p.aiModel.name !== 'BangaBot');
     } else if (referrer === 'model' && model) {
       // Filter to specific model
       predictions = predictions.filter(
@@ -53,18 +55,28 @@ export default function MatchDetailsPage() {
     
     return predictions;
   }, [match, referrer, market, model]);
+
+  // For AI model referrer, get all qualified markets for that model
+  const relevantMarkets = useMemo(() => {
+    if (referrer === 'model' && model && relevantPredictions.length > 0) {
+      return getQualifiedMarkets(relevantPredictions[0]);
+    }
+    return [];
+  }, [referrer, model, relevantPredictions]);
   
-  // Set default selection to first prediction (Gemini if available)
+  // Set default selection to first prediction (Gemini if available) or first market for AI model
   React.useEffect(() => {
-    if (relevantPredictions.length > 0 && !selectedPrediction) {
+    if (referrer === 'model' && model && relevantMarkets.length > 0 && !selectedPrediction) {
+      setSelectedPrediction(relevantMarkets[0].key);
+    } else if (relevantPredictions.length > 0 && !selectedPrediction) {
       const geminiPrediction = relevantPredictions.find(p => p.aiModel.name === 'Gemini');
       setSelectedPrediction(geminiPrediction?.aiModel.name || relevantPredictions[0].aiModel.name);
     }
-  }, [relevantPredictions, selectedPrediction]);
+  }, [relevantPredictions, relevantMarkets, selectedPrediction, referrer, model]);
   
-  const selectedPredictionData = relevantPredictions.find(
-    p => p.aiModel.name === selectedPrediction
-  );
+  const selectedPredictionData = referrer === 'model' && model 
+    ? relevantPredictions[0] // For AI model referrer, always use the model's prediction
+    : relevantPredictions.find(p => p.aiModel.name === selectedPrediction);
   
   if (!match) {
     return (
@@ -208,50 +220,131 @@ export default function MatchDetailsPage() {
         </div>
         
         {/* Prediction Cards */}
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {relevantPredictions.map((prediction) => (
-            <button
-              key={prediction.aiModel.name}
-              onClick={() => setSelectedPrediction(prediction.aiModel.name)}
-              className={cn(
-                "bg-gray-800 border rounded-lg p-4 text-left transition-colors",
-                selectedPrediction === prediction.aiModel.name
-                  ? "border-blue-500 bg-blue-900/20"
-                  : "border-gray-700 hover:border-gray-600"
-              )}
-            >
-              <div className="flex items-center space-x-2 mb-3">
-                <TrendingUp className="h-4 w-4 text-blue-400" />
-                <span className="font-medium text-white">{prediction.aiModel.name}</span>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-white">
-                    {prediction.predictedHomeGoal}-{prediction.predictedAwayGoal}
-                  </div>
-                  <div className="text-xs text-gray-400">Predicted Score</div>
+        {referrer === 'model' && model ? (
+          /* AI Model referrer - split layout */
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left side - Scoreline Prediction */}
+            <div className="lg:col-span-1">
+              <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+                <div className="flex items-center space-x-2 mb-4">
+                  <TrendingUp className="h-5 w-5 text-blue-400" />
+                  <span className="font-medium text-white">{model.charAt(0).toUpperCase() + model.slice(1)} Prediction</span>
                 </div>
                 
-                {referrer === 'market' && market && usesTotalGoalsConfidence(market) ? (
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-green-400">
-                      {prediction.confidenceLevelPTG}%
+                {selectedPredictionData && (
+                  <div className="space-y-6">
+                    {/* Score with inline confidence */}
+                    <div className="text-center">
+                      <div className="flex items-baseline justify-center space-x-3 mb-2">
+                        <div className="text-4xl font-bold text-white">
+                          {selectedPredictionData.predictedHomeGoal}-{selectedPredictionData.predictedAwayGoal}
+                        </div>
+                        <div className="text-sm text-green-400 font-medium">
+                          {selectedPredictionData.confidenceLevel}%
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-400">Predicted Score</div>
                     </div>
-                    <div className="text-xs text-gray-400">Goals Confidence</div>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-green-400">
-                      {prediction.confidenceLevel}%
+                    
+                    {/* Goals with inline confidence */}
+                    <div className="text-center">
+                      <div className="flex items-baseline justify-center space-x-3 mb-2">
+                        <div className="text-3xl font-bold text-white">
+                          {selectedPredictionData.predictedTotalGoals}
+                        </div>
+                        <div className="text-sm text-yellow-400 font-medium">
+                          {selectedPredictionData.confidenceLevelPTG}%
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-400">Expected Goals</div>
                     </div>
-                    <div className="text-xs text-gray-400">Score Confidence</div>
                   </div>
                 )}
               </div>
-            </button>
-          ))}
-        </div>
+            </div>
+            
+            {/* Right side - Market Cards */}
+            <div className="lg:col-span-2">
+              <div className="mb-4">
+                <h4 className="text-lg font-semibold text-white">Qualifying Markets</h4>
+                <p className="text-sm text-gray-400">Markets where this model qualifies</p>
+              </div>
+              
+              <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+                {relevantMarkets.map((marketData) => (
+                  <button
+                    key={marketData.key}
+                    onClick={() => setSelectedPrediction(marketData.key)}
+                    className={cn(
+                      "bg-gray-800 border rounded-lg p-3 text-center transition-colors",
+                      selectedPrediction === marketData.key
+                        ? "border-blue-500 bg-blue-900/20"
+                        : "border-gray-700 hover:border-gray-600"
+                    )}
+                  >
+                    <div className="text-sm font-medium text-white">
+                      {marketData.name}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Other referrers - regular grid layout */
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            {relevantPredictions.map((prediction) => (
+              <button
+                key={prediction.aiModel.name}
+                onClick={() => setSelectedPrediction(prediction.aiModel.name)}
+                className={cn(
+                  "bg-gray-800 border rounded-lg p-4 text-left transition-colors",
+                  selectedPrediction === prediction.aiModel.name
+                    ? "border-blue-500 bg-blue-900/20"
+                    : "border-gray-700 hover:border-gray-600"
+                )}
+              >
+                <div className="flex items-center space-x-2 mb-3">
+                  <TrendingUp className="h-4 w-4 text-blue-400" />
+                  <span className="font-medium text-white">{prediction.aiModel.name}</span>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">
+                      {prediction.predictedHomeGoal}-{prediction.predictedAwayGoal}
+                    </div>
+                    <div className="text-xs text-gray-400">Predicted Score</div>
+                  </div>
+                  
+                  {/* Display confidence based on referrer and market type */}
+                  {referrer === 'market' && market && usesTotalGoalsConfidence(market) ? (
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-green-400">
+                        {prediction.confidenceLevelPTG}%
+                      </div>
+                      <div className="text-xs text-gray-400">Confidence Level</div>
+                    </div>
+                  ) : referrer === 'market' && market ? (
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-green-400">
+                        {prediction.confidenceLevel}%
+                      </div>
+                      <div className="text-xs text-gray-400">Confidence Level</div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-green-400">
+                        {prediction.confidenceLevel}%
+                      </div>
+                      <div className="text-xs text-gray-400">Score Confidence</div>
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
         
         {/* Selected Prediction Details */}
         {selectedPredictionData && (
@@ -263,73 +356,40 @@ export default function MatchDetailsPage() {
               </h4>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Score Prediction */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Target className="h-4 w-4 text-green-400" />
-                  <span className="font-medium text-white">Score Prediction</span>
-                </div>
-                
-                <div className="bg-gray-700 rounded-lg p-4">
-                  <div className="text-center mb-3">
-                    <div className="text-3xl font-bold text-white">
-                      {selectedPredictionData.predictedHomeGoal}-{selectedPredictionData.predictedAwayGoal}
-                    </div>
-                    <div className="text-sm text-gray-400">Final Score</div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Confidence:</span>
-                      <span className="text-green-400 font-medium">
-                        {selectedPredictionData.confidenceLevel}%
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-700 rounded-lg p-4">
-                  <h5 className="font-medium text-white mb-2">Reasoning</h5>
-                  <p className="text-gray-300 text-sm">
-                    {selectedPredictionData.confidenceLevelReasoning}
-                  </p>
-                </div>
+            {/* Show different layouts based on referrer type */}
+            {referrer === 'market' && market && usesTotalGoalsConfidence(market) ? (
+              /* Market referrer with over/under - show only goals reasoning */
+              <div className="bg-gray-700 rounded-lg p-4">
+                <h5 className="font-medium text-white mb-2">Match Analysis</h5>
+                <p className="text-gray-300 text-sm">
+                  {selectedPredictionData.confidenceLevelReasoningPTG}
+                </p>
               </div>
-              
-              {/* Goals Prediction */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Target className="h-4 w-4 text-yellow-400" />
-                  <span className="font-medium text-white">Total Goals</span>
-                </div>
-                
-                <div className="bg-gray-700 rounded-lg p-4">
-                  <div className="text-center mb-3">
-                    <div className="text-3xl font-bold text-white">
-                      {selectedPredictionData.predictedTotalGoals}
-                    </div>
-                    <div className="text-sm text-gray-400">Expected Goals</div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Confidence:</span>
-                      <span className="text-yellow-400 font-medium">
-                        {selectedPredictionData.confidenceLevelPTG}%
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-700 rounded-lg p-4">
-                  <h5 className="font-medium text-white mb-2">Goals Analysis</h5>
-                  <p className="text-gray-300 text-sm">
-                    {selectedPredictionData.confidenceLevelReasoningPTG}
-                  </p>
-                </div>
+            ) : referrer === 'market' && market ? (
+              /* Market referrer with score markets - show only score reasoning */
+              <div className="bg-gray-700 rounded-lg p-4">
+                <h5 className="font-medium text-white mb-2">Match Analysis</h5>
+                <p className="text-gray-300 text-sm">
+                  {selectedPredictionData.confidenceLevelReasoning}
+                </p>
               </div>
-            </div>
+            ) : referrer === 'model' && model ? (
+              /* AI Model referrer - show only score reasoning */
+              <div className="bg-gray-700 rounded-lg p-4">
+                <h5 className="font-medium text-white mb-2">Match Analysis</h5>
+                <p className="text-gray-300 text-sm">
+                  {selectedPredictionData.confidenceLevelReasoning}
+                </p>
+              </div>
+            ) : (
+              /* Homepage or Country referrer - show only score reasoning */
+              <div className="bg-gray-700 rounded-lg p-4">
+                <h5 className="font-medium text-white mb-2">Match Analysis</h5>
+                <p className="text-gray-300 text-sm">
+                  {selectedPredictionData.confidenceLevelReasoning}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>

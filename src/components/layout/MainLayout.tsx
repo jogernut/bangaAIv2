@@ -7,6 +7,7 @@ import RightPanel from './RightPanel';
 import TopMenu from './TopMenu';
 import { Menu, X } from 'lucide-react';
 import { mockFixtures, type Fixture } from '@/data/mock';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -15,40 +16,47 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children, className }: MainLayoutProps) {
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(false);
+  const { isDarkMode } = useTheme();
   
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Top Menu */}
-      <TopMenu />
+    <div className={cn(
+      'min-h-screen transition-colors',
+      isDarkMode ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'
+    )}>
+      {/* Top Menu - Hidden on mobile */}
+      <div className="hidden lg:block">
+        <TopMenu />
+      </div>
       
+      {/* Mobile Menu Button - Top Right */}
+      <div className="lg:hidden fixed top-4 right-4 z-50">
+        <button
+          onClick={() => setIsLeftPanelOpen(true)}
+          className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-lg border border-gray-300 dark:border-gray-700 transition-colors shadow-lg"
+        >
+          <Menu className="h-5 w-5 text-gray-900 dark:text-white" />
+        </button>
+      </div>
+
       {/* Container with proper site-wide padding */}
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
-              {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-24 left-4 z-50">
-          <button
-            onClick={() => setIsLeftPanelOpen(true)}
-            className="bg-gray-800 hover:bg-gray-700 p-2 rounded-lg border border-gray-700 transition-colors"
-          >
-            <Menu className="h-5 w-5 text-white" />
-          </button>
-        </div>
+      <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-12">
         
               {/* Main Content Area */}
-      <div className="flex min-h-[calc(100vh-80px)]">
+      <div className="flex min-h-screen lg:min-h-[calc(100vh-80px)]">
           {/* Left Panel - Navigation & Filters */}
           <div className={cn(
-            "w-56 flex-shrink-0 bg-gray-900 border-r border-gray-800 transition-transform duration-300 ease-in-out",
+            "w-56 md:w-64 flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out",
             "lg:translate-x-0", // Always visible on large screens
-            "fixed lg:static inset-y-0 left-0 z-40 top-20", // Mobile: fixed overlay
+            "fixed lg:static inset-y-0 left-0 z-40 top-0 lg:top-20", // Mobile: fixed overlay
             isLeftPanelOpen ? "translate-x-0" : "-translate-x-full" // Mobile: slide in/out
           )}>
             {/* Mobile Close Button */}
             <div className="lg:hidden absolute top-4 right-4 z-50">
               <button
                 onClick={() => setIsLeftPanelOpen(false)}
-                className="bg-gray-800 hover:bg-gray-700 p-1 rounded-lg border border-gray-700 transition-colors"
+                className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-lg border border-gray-300 dark:border-gray-700 transition-colors"
               >
-                <X className="h-4 w-4 text-white" />
+                <X className="h-4 w-4 text-gray-900 dark:text-white" />
               </button>
             </div>
                           <LeftPanel fixtures={mockFixtures} />
@@ -67,13 +75,13 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
             "flex-1 overflow-auto",
             className
           )}>
-            <main className="p-3 lg:p-4">
+            <main className="p-2 md:p-3 lg:p-4">
               {children}
             </main>
           </div>
           
           {/* Right Panel - Ads (Hidden on mobile/tablet) */}
-          <div className="hidden xl:block w-64 flex-shrink-0 bg-gray-900 border-l border-gray-800">
+          <div className="hidden xl:block w-64 flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800">
             <RightPanel />
           </div>
         </div>

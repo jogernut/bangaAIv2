@@ -496,8 +496,8 @@ export const mockMarkets = [
   { key: "over1_5", name: "Over 1.5", description: "Over 1.5 Goals" },
   { key: "under2_5", name: "Under 2.5", description: "Under 2.5 Goals" },
   { key: "under1_5", name: "Under 1.5", description: "Under 1.5 Goals" },
-  { key: "GG", name: "BTTS Yes", description: "Both Teams to Score (Yes)" },
-  { key: "NG", name: "BTTS No", description: "Both Teams to Score (No)" },
+  { key: "GG", name: "BTTS (Yes)", description: "Both Teams to Score (Yes)" },
+  { key: "NG", name: "BTTS (No)", description: "Both Teams to Score (No)" },
   { key: "home_win", name: "Home Win", description: "Home Team Win" },
   { key: "away_win", name: "Away Win", description: "Away Team Win" },
   { key: "draw", name: "Draw", description: "Match Draw" }

@@ -50,14 +50,14 @@ export const getQualifiedMarkets = (prediction: ModelPrediction): QualifiedMarke
   if (predictedHomeGoal >= 1 && predictedAwayGoal >= 1) {
     qualifiedMarkets.push({
       key: 'GG',
-      name: 'BTTS Yes',
+      name: 'BTTS (Yes)',
       description: 'Both Teams to Score (Yes)',
       prediction
     });
   } else {
     qualifiedMarkets.push({
       key: 'NG',
-      name: 'BTTS No',
+      name: 'BTTS (No)',
       description: 'Both Teams to Score (No)',
       prediction
     });

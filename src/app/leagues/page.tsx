@@ -38,10 +38,10 @@ export default function LeaguesPage() {
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
           <div>
-            <h1 className="text-lg lg:text-xl font-bold text-white mb-1">
+            <h1 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-1">
               All Leagues
             </h1>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Browse matches by league and country
             </p>
           </div>
@@ -82,20 +82,20 @@ export default function LeaguesPage() {
                     <Link
                       key={league}
                       href={`/leagues/${league.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 hover:bg-gray-750 transition-all duration-200 group"
+                      className="rounded-lg p-4 transition-all duration-200 group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-750"
                     >
                       <div className="flex items-center space-x-3 mb-3">
                         <span className="text-lg">
                           {getCountryFlag(country)}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-white truncate group-hover:text-blue-400 transition-colors">
+                          <h3 className="font-semibold truncate transition-colors text-gray-900 group-hover:text-blue-700 dark:text-white dark:group-hover:text-blue-400">
                             {league}
                           </h3>
                         </div>
                       </div>
                       
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
                         {leagueFixtures.length} match{leagueFixtures.length !== 1 ? 'es' : ''} today
                       </div>
                     </Link>

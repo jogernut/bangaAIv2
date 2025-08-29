@@ -35,11 +35,16 @@ export default function MarketPage() {
       .filter(fixture => fixture.modelPredictions.length > 0); // Only show matches with qualifying predictions
   }, [selectedDate, market]);
   
-  // Group fixtures by country and league
+  // Group fixtures by country and league, then sort by model count
   const groupedFixtures = useMemo(() => {
     const groups: Record<string, typeof filteredFixtures> = {};
     
-    filteredFixtures.forEach(fixture => {
+    // First sort individual fixtures by number of qualifying model predictions (highest first)
+    const sortedFixtures = [...filteredFixtures].sort((a, b) => {
+      return b.modelPredictions.length - a.modelPredictions.length;
+    });
+    
+    sortedFixtures.forEach(fixture => {
       const key = `${fixture.country}-${fixture.league}`;
       if (!groups[key]) {
         groups[key] = [];
@@ -48,7 +53,16 @@ export default function MarketPage() {
     });
     
     return Object.entries(groups)
-      .sort(([keyA], [keyB]) => {
+      .sort(([keyA, fixturesA], [keyB, fixturesB]) => {
+        // Sort groups by total number of model predictions (highest first)
+        const totalModelsA = fixturesA.reduce((sum, f) => sum + f.modelPredictions.length, 0);
+        const totalModelsB = fixturesB.reduce((sum, f) => sum + f.modelPredictions.length, 0);
+        
+        if (totalModelsA !== totalModelsB) {
+          return totalModelsB - totalModelsA; // Highest model count first
+        }
+        
+        // If same model count, sort by country then league
         const [countryA, leagueA] = keyA.split('-');
         const [countryB, leagueB] = keyB.split('-');
         
