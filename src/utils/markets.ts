@@ -1,6 +1,11 @@
 // Market qualification logic for AI predictions
 import { ModelPrediction } from '@/data/mock';
 
+// Utility function to check if a team logo URL is available
+export const isLogoAvailable = (logoUrl: string | undefined | null): boolean => {
+  return !!(logoUrl && logoUrl.trim() !== '' && !logoUrl.includes('placeholder'));
+};
+
 export interface QualifiedMarket {
   key: string;
   name: string;

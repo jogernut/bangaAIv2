@@ -8,7 +8,7 @@ import { cn } from '@/utils/cn';
 // import { getCountryFlag } from '@/utils/countries'; // Will be used for country displays
 import { formatMatchTime } from '@/utils/date';
 import { Fixture, ModelPrediction } from '@/data/mock';
-import { getQualifiedMarkets, getMarketDisplayValue } from '@/utils/markets';
+import { getQualifiedMarkets, getMarketDisplayValue, isLogoAvailable } from '@/utils/markets';
 
 interface MatchCardProps {
   fixture: Fixture;
@@ -71,35 +71,39 @@ export default function MatchCard({
           <div className="flex-1 mx-3">
             {/* Home Team */}
             <div className="flex items-center space-x-2 mb-1">
-              <div className="w-4 h-4 relative flex-shrink-0">
-                <Image
-                  src={fixture.hometeamlogo}
-                  alt={`${fixture.hometeam} logo`}
-                  fill
-                  className="object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
-                  }}
-                />
-              </div>
+              {isLogoAvailable(fixture.hometeamlogo) && (
+                <div className="w-4 h-4 relative flex-shrink-0">
+                  <Image
+                    src={fixture.hometeamlogo}
+                    alt={`${fixture.hometeam} logo`}
+                    fill
+                    className="object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
+                    }}
+                  />
+                </div>
+              )}
               <span className="text-xs font-medium text-white truncate transition-colors">{fixture.hometeam}</span>
             </div>
 
             {/* Away Team */}
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 relative flex-shrink-0">
-                <Image
-                  src={fixture.awayteamlogo}
-                  alt={`${fixture.awayteam} logo`}
-                  fill
-                  className="object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
-                  }}
-                />
-              </div>
+              {isLogoAvailable(fixture.awayteamlogo) && (
+                <div className="w-4 h-4 relative flex-shrink-0">
+                  <Image
+                    src={fixture.awayteamlogo}
+                    alt={`${fixture.awayteam} logo`}
+                    fill
+                    className="object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
+                    }}
+                  />
+                </div>
+              )}
               <span className="text-xs font-medium text-white truncate transition-colors">{fixture.awayteam}</span>
             </div>
           </div>
@@ -170,35 +174,39 @@ export default function MatchCard({
         <div className="min-w-0">
           {/* Home Team */}
           <div className="flex items-center space-x-2 mb-2">
-            <div className="w-5 h-5 relative flex-shrink-0">
-              <Image
-                src={fixture.hometeamlogo}
-                alt={`${fixture.hometeam} logo`}
-                fill
-                className="object-contain"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
-                }}
-              />
-            </div>
+            {isLogoAvailable(fixture.hometeamlogo) && (
+              <div className="w-5 h-5 relative flex-shrink-0">
+                <Image
+                  src={fixture.hometeamlogo}
+                  alt={`${fixture.hometeam} logo`}
+                  fill
+                  className="object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
+                  }}
+                />
+              </div>
+            )}
             <span className="text-sm font-medium text-white truncate transition-colors">{fixture.hometeam}</span>
           </div>
 
           {/* Away Team */}
           <div className="flex items-center space-x-2">
-            <div className="w-5 h-5 relative flex-shrink-0">
-              <Image
-                src={fixture.awayteamlogo}
-                alt={`${fixture.awayteam} logo`}
-                fill
-                className="object-contain"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
-                }}
-              />
-            </div>
+            {isLogoAvailable(fixture.awayteamlogo) && (
+              <div className="w-5 h-5 relative flex-shrink-0">
+                <Image
+                  src={fixture.awayteamlogo}
+                  alt={`${fixture.awayteam} logo`}
+                  fill
+                  className="object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
+                  }}
+                />
+              </div>
+            )}
             <span className="text-sm font-medium text-white truncate transition-colors">{fixture.awayteam}</span>
           </div>
         </div>

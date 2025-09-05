@@ -7,7 +7,7 @@ import Link from 'next/link';
 import MainLayout from '@/components/layout/MainLayout';
 import { getCountryFlag } from '@/utils/countries';
 import { formatMatchTime, formatMatchDate } from '@/utils/date';
-import { getQualifiedMarkets, usesTotalGoalsConfidence } from '@/utils/markets';
+import { getQualifiedMarkets, usesTotalGoalsConfidence, isLogoAvailable } from '@/utils/markets';
 import { mockFixtures } from '@/data/mock';
 // Removed unused imports
 import { ArrowLeft, Clock, TrendingUp, Shield } from 'lucide-react';
@@ -144,18 +144,20 @@ export default function MatchDetailsPage() {
           <div className="grid grid-cols-2 gap-4">
             {/* Home Team */}
             <div className="text-center bg-gray-700 rounded-lg p-3">
-              <div className="w-12 h-12 mx-auto mb-2 relative">
-                <Image
-                  src={match.hometeamlogo}
-                  alt={`${match.hometeam} logo`}
-                  fill
-                  className="object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
-                  }}
-                />
-              </div>
+              {isLogoAvailable(match.hometeamlogo) && (
+                <div className="w-12 h-12 mx-auto mb-2 relative">
+                  <Image
+                    src={match.hometeamlogo}
+                    alt={`${match.hometeam} logo`}
+                    fill
+                    className="object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
+                    }}
+                  />
+                </div>
+              )}
               <h3 className="text-sm font-bold text-white mb-1">{match.hometeam}</h3>
               <p className="text-xs text-gray-400 mb-2">Home</p>
               
@@ -173,18 +175,20 @@ export default function MatchDetailsPage() {
 
             {/* Away Team */}
             <div className="text-center bg-gray-700 rounded-lg p-3">
-              <div className="w-12 h-12 mx-auto mb-2 relative">
-                <Image
-                  src={match.awayteamlogo}
-                  alt={`${match.awayteam} logo`}
-                  fill
-                  className="object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
-                  }}
-                />
-              </div>
+              {isLogoAvailable(match.awayteamlogo) && (
+                <div className="w-12 h-12 mx-auto mb-2 relative">
+                  <Image
+                    src={match.awayteamlogo}
+                    alt={`${match.awayteam} logo`}
+                    fill
+                    className="object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
+                    }}
+                  />
+                </div>
+              )}
               <h3 className="text-sm font-bold text-white mb-1">{match.awayteam}</h3>
               <p className="text-xs text-gray-400 mb-2">Away</p>
               
@@ -207,18 +211,20 @@ export default function MatchDetailsPage() {
           {/* Home Team */}
           <div className="text-center">
             <div className="mb-3">
-              <div className="w-16 h-16 mx-auto mb-2 relative">
-                <Image
-                  src={match.hometeamlogo}
-                  alt={`${match.hometeam} logo`}
-                  fill
-                  className="object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
-                  }}
-                />
-              </div>
+              {isLogoAvailable(match.hometeamlogo) && (
+                <div className="w-16 h-16 mx-auto mb-2 relative">
+                  <Image
+                    src={match.hometeamlogo}
+                    alt={`${match.hometeam} logo`}
+                    fill
+                    className="object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
+                    }}
+                  />
+                </div>
+              )}
               <h2 className="text-xl font-bold text-white">{match.hometeam}</h2>
               <p className="text-sm text-gray-400">Home</p>
             </div>
@@ -253,18 +259,20 @@ export default function MatchDetailsPage() {
           {/* Away Team */}
           <div className="text-center">
             <div className="mb-3">
-              <div className="w-16 h-16 mx-auto mb-2 relative">
-                <Image
-                  src={match.awayteamlogo}
-                  alt={`${match.awayteam} logo`}
-                  fill
-                  className="object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
-                  }}
-                />
-              </div>
+              {isLogoAvailable(match.awayteamlogo) && (
+                <div className="w-16 h-16 mx-auto mb-2 relative">
+                  <Image
+                    src={match.awayteamlogo}
+                    alt={`${match.awayteam} logo`}
+                    fill
+                    className="object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" fill="%23374151"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="14">🌍</text></svg>`;
+                    }}
+                  />
+                </div>
+              )}
               <h2 className="text-xl font-bold text-white">{match.awayteam}</h2>
               <p className="text-sm text-gray-400">Away</p>
             </div>
