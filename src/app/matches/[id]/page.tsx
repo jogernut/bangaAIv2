@@ -537,7 +537,7 @@ export default function MatchDetailsPage() {
           </div>
         ) : (
           /* Other referrers - mobile-friendly grid layout */
-          <div className="grid gap-3 lg:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 lg:gap-4 grid-cols-2 lg:grid-cols-4">
             {relevantPredictions.map((prediction) => {
               // Model-based color scheme for consistency - matching MatchCard colors
               const getModelColors = (modelName: string) => {

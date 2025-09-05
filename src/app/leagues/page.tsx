@@ -32,7 +32,7 @@ export default function LeaguesPage() {
   const sortedCountries = Object.keys(leaguesByCountry).sort();
 
   return (
-    <MainLayout>
+    <MainLayout fixtures={mockFixtures}>
       <main className="p-3 lg:p-4">
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">

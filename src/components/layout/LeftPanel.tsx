@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Pin, PinOff, Bot } from 'lucide-react';
+import { Pin, PinOff } from 'lucide-react';
 import SearchBox from '@/components/ui/SearchBox';
 import { cn } from '@/utils/cn';
 import { getCountryFlag } from '@/utils/countries';
@@ -106,13 +106,6 @@ export default function LeftPanel({ }: LeftPanelProps) {
   const displayedLeagues = sortedLeagues.slice(0, leaguesToShow);
   const displayedCountries = sortedCountries.slice(0, countriesToShow);
   
-  // AI Models for mobile navigation
-  const aiModels = [
-    { name: 'Gemini', path: '/models/gemini' },
-    { name: 'ChatGPT', path: '/models/chatgpt' },
-    { name: 'Grok', path: '/models/grok' },
-    { name: 'ML', path: '/models/ml' },
-  ];
   
   return (
     <div className="h-full flex flex-col">
@@ -220,39 +213,6 @@ export default function LeftPanel({ }: LeftPanelProps) {
           </div>
         </div>
         
-        {/* AI Models - Mobile Only */}
-        <div className="px-4 mb-6 lg:hidden">
-          <h3 className="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">
-            Models
-          </h3>
-          <div className="space-y-1">
-            {aiModels.map((model) => (
-              <Link
-                key={model.name}
-                href={model.path}
-                className={cn(
-                  "block p-2 rounded-lg text-sm transition-colors",
-                  pathname === model.path
-                    ? "bg-blue-600/20 text-blue-400"
-                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-200 text-gray-300 hover:text-white hover:bg-gray-800"
-                )}
-              >
-                {model.name}
-              </Link>
-            ))}
-            
-            {/* BangaBot Special Link */}
-            <a
-              href={API_CONFIG.BANGABOT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 p-2 rounded-lg text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-200 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
-            >
-              <Bot className="h-4 w-4" />
-              <span>BangaBot</span>
-            </a>
-          </div>
-        </div>
         
         {/* Countries */}
         <div className="px-4 mb-6">
