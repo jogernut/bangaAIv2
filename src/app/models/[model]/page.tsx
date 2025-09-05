@@ -1,6 +1,7 @@
+'use client';
+
 import React, { useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import type { Metadata } from "next";
 import MainLayout from '@/components/layout/MainLayout';
 import DatePicker from '@/components/ui/DatePicker';
 import MatchCard from '@/components/ui/MatchCard';
@@ -10,57 +11,6 @@ import { mockAiModels } from '@/data/mock';
 import { useFixtures } from '@/contexts/FixturesContext';
 // Removed unused imports
 import { Brain, Bot } from 'lucide-react';
-
-type Props = {
-  params: { model: string }
-}
-
-export function generateMetadata({ params }: Props): Metadata {
-  const modelParam = params.model;
-  let modelName = modelParam.charAt(0).toUpperCase() + modelParam.slice(1);
-
-  // Handle special cases
-  if (modelParam.toLowerCase() === 'chatgpt') {
-    modelName = 'ChatGPT';
-  } else if (modelParam.toLowerCase() === 'grok') {
-    modelName = 'Grok';
-  } else if (modelParam.toLowerCase() === 'ml') {
-    modelName = 'ML';
-  } else if (modelParam.toLowerCase() === 'gemini') {
-    modelName = 'Gemini';
-  }
-
-  const modelDescriptions = {
-    'Gemini': 'Get the most accurate football predictions powered by Google\'s Gemini AI model',
-    'ChatGPT': 'Advanced football predictions using OpenAI\'s ChatGPT for professional betting analysis',
-    'Grok': 'Cutting-edge soccer predictions powered by xAI\'s Grok AI technology',
-    'ML': 'Machine learning powered football predictions with statistical analysis'
-  };
-
-  return {
-    title: `${modelName} AI Football Predictions - Banga.ai`,
-    description: modelDescriptions[modelName as keyof typeof modelDescriptions] || `AI-powered football predictions using ${modelName} technology`,
-    keywords: [
-      `${modelName} football predictions`,
-      `${modelName} AI soccer tips`,
-      `${modelName} match predictions`,
-      `${modelName} betting analysis`,
-      `AI ${modelName} football`,
-      `${modelName} soccer predictions`
-    ],
-    openGraph: {
-      title: `${modelName} AI Football Predictions - Banga.ai`,
-      description: modelDescriptions[modelName as keyof typeof modelDescriptions] || `AI-powered football predictions using ${modelName} technology`,
-      type: "website",
-      url: `https://banga.ai/models/${modelParam}`,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${modelName} AI Football Predictions`,
-      description: modelDescriptions[modelName as keyof typeof modelDescriptions] || `AI-powered football predictions using ${modelName} technology`,
-    },
-  };
-}
 
 export default function ModelPage() {
   const params = useParams();
