@@ -1,29 +1,83 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Pin, PinOff, Bot } from 'lucide-react';
 import SearchBox from '@/components/ui/SearchBox';
 import { cn } from '@/utils/cn';
 import { getCountryFlag } from '@/utils/countries';
-import { mockMarkets, getUniqueLeagues, getUniqueCountries, type Fixture } from '@/data/mock';
+import { mockMarkets, getUniqueLeagues, getUniqueCountries, type Fixture, mockFixtures } from '@/data/mock';
 import { sortLeaguesByPriority, sortCountriesByPriority, MAX_PRIORITY_LEAGUES, MAX_PRIORITY_COUNTRIES } from '@/config/priorities';
-import { API_CONFIG } from '@/config/api';
+import { API_CONFIG, buildApiUrl, shouldUseMockData } from '@/config/api';
+import { transformFixtureModelNames } from '@/utils/models';
+import { useFixtures } from '@/contexts/FixturesContext';
 
 interface LeftPanelProps {
-  fixtures: Fixture[];
+  fixtures: Fixture[]; // Keep for backwards compatibility but use homepage fixtures internally
 }
 
-export default function LeftPanel({ fixtures }: LeftPanelProps) {
+export default function LeftPanel({ }: LeftPanelProps) {
   const pathname = usePathname();
   // const [searchQuery, setSearchQuery] = useState(''); // Will be used for search functionality
   const [pinnedLeagues, setPinnedLeagues] = useState<string[]>([]);
   const [leaguesToShow, setLeaguesToShow] = useState(MAX_PRIORITY_LEAGUES);
   const [countriesToShow, setCountriesToShow] = useState(MAX_PRIORITY_COUNTRIES);
+  const [homepageFixtures, setHomepageFixtures] = useState<Fixture[]>(mockFixtures);
+  const { selectedDate } = useFixtures();
+  
+  // Fetch homepage fixtures independently for the left menu
+  useEffect(() => {
+    const fetchHomepageFixtures = async () => {
+      try {
+        // Check if we should use mock data
+        if (shouldUseMockData()) {
+          setHomepageFixtures(mockFixtures);
+          return;
+        }
+
+        // Build API URL for homepage fixtures - Convert date format from yyyy-MM-dd to MM/dd/yyyy
+        const [year, month, day] = selectedDate.split('-');
+        const apiDate = `${month}/${day}/${year}`;
+        
+        const apiUrl = buildApiUrl(API_CONFIG.ENDPOINTS.HOMEPAGE, {
+          date: apiDate
+        });
+        
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`);
+        }
+        
+        const responseText = await response.text();
+        if (!responseText.trim()) {
+          throw new Error('API returned empty response');
+        }
+        
+        const data = JSON.parse(responseText);
+        const transformedFixtures = transformFixtureModelNames(data);
+        setHomepageFixtures(transformedFixtures);
+        
+      } catch (err) {
+        console.error('❌ LeftPanel: Failed to fetch homepage fixtures:', err);
+        // Fallback to mock data
+        setHomepageFixtures(mockFixtures);
+      }
+    };
+
+    fetchHomepageFixtures();
+  }, [selectedDate]);
   
   // Get pinned leagues from session storage on component mount
-  React.useEffect(() => {
+  useEffect(() => {
     const saved = sessionStorage.getItem('pinnedLeagues');
     if (saved) {
       setPinnedLeagues(JSON.parse(saved));
@@ -40,9 +94,9 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
     sessionStorage.setItem('pinnedLeagues', JSON.stringify(updated));
   };
 
-  // Get dynamic data from fixtures
-  const allLeagues = getUniqueLeagues(fixtures);
-  const allCountries = getUniqueCountries(fixtures);
+  // Get dynamic data from homepage fixtures (not current page fixtures)
+  const allLeagues = getUniqueLeagues(homepageFixtures);
+  const allCountries = getUniqueCountries(homepageFixtures);
   
   // Sort leagues and countries by priority
   const sortedLeagues = sortLeaguesByPriority(allLeagues.map(l => l.league));
@@ -64,7 +118,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
     <div className="h-full flex flex-col">
       {/* Search Box */}
       <div className="p-4">
-        <SearchBox fixtures={fixtures} />
+        <SearchBox fixtures={homepageFixtures} />
       </div>
       
       <div className="flex-1 overflow-y-auto">
@@ -78,8 +132,8 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
               const leagueData = allLeagues.find(l => l.league === leagueName);
               if (!leagueData) return null;
               
-              // Count actual matches for this league
-              const matchCount = fixtures.filter(f => f.league === leagueName).length;
+              // Count actual matches for this league from homepage fixtures
+              const matchCount = homepageFixtures.filter(f => f.league === leagueName).length;
               
               return (
                 <div key={`${leagueName}-${index}`} className="flex items-center justify-between group">
@@ -207,7 +261,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
           </h3>
           <div className="space-y-1">
             {displayedCountries.map((country, index) => {
-              const countryMatches = fixtures.filter(f => f.country === country).length;
+              const countryMatches = homepageFixtures.filter(f => f.country === country).length;
               return (
               <Link
                 key={`${country}-${index}`}
