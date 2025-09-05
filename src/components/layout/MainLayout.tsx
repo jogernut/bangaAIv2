@@ -5,8 +5,11 @@ import { cn } from '@/utils/cn';
 import LeftPanel from './LeftPanel';
 import RightPanel from './RightPanel';
 import TopMenu from './TopMenu';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Bot } from 'lucide-react';
 import { mockFixtures, Fixture } from '@/data/mock';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { API_CONFIG } from '@/config/api';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -14,13 +17,54 @@ interface MainLayoutProps {
   fixtures?: Fixture[];
 }
 
+const aiModels = [
+  { name: 'Gemini', path: '/models/gemini' },
+  { name: 'ChatGPT', path: '/models/chatgpt' },
+  { name: 'Grok', path: '/models/grok' },
+  { name: 'ML', path: '/models/ml' },
+];
+
 export default function MainLayout({ children, className, fixtures }: MainLayoutProps) {
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(false);
+  const pathname = usePathname();
   
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Top Menu */}
       <TopMenu />
+      
+      {/* Mobile Models Menu - Below Top Bar */}
+      <div className="lg:hidden bg-gray-900 border-b border-gray-800">
+        <div className="max-w-[1600px] mx-auto px-3">
+          <div className="flex items-stretch gap-1 py-3">
+            {aiModels.map((model) => (
+              <Link
+                key={model.name}
+                href={model.path}
+                className={cn(
+                  "flex-1 px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-center",
+                  pathname === model.path
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
+                    : "text-gray-300 hover:text-white hover:bg-gray-800/80 bg-gray-800/50"
+                )}
+              >
+                {model.name}
+              </Link>
+            ))}
+            
+            {/* BangaBot Button */}
+            <a
+              href={API_CONFIG.BANGABOT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-1 flex-1 px-2 py-2 rounded-lg text-sm font-medium bg-white text-gray-900 hover:bg-gray-100 transition-colors border border-gray-300"
+            >
+              <Bot className="h-4 w-4" />
+              <span>Bot</span>
+            </a>
+          </div>
+        </div>
+      </div>
       
       {/* Mobile Menu Button - Top Right (Transforms to Close) */}
       <div className="lg:hidden fixed top-4 right-4 z-50">
@@ -40,27 +84,22 @@ export default function MainLayout({ children, className, fixtures }: MainLayout
       <div className="max-w-[1600px] mx-auto px-3 md:px-8 lg:px-16">
         
               {/* Main Content Area */}
-      <div className="flex min-h-[calc(100vh-80px)]">
+      <div className="flex min-h-[calc(100vh-128px)] lg:min-h-[calc(100vh-80px)]">
           {/* Left Panel - Navigation & Filters */}
           <div className={cn(
-            "w-56 md:w-64 flex-shrink-0 bg-gray-900 border-r border-gray-800 transition-all duration-300 ease-in-out",
+            "lg:w-56 xl:w-64 flex-shrink-0 bg-gray-900 border-r border-gray-800 transition-all duration-300 ease-in-out",
             "lg:translate-x-0", // Always visible on large screens
-            "fixed lg:static inset-y-0 lg:left-0 z-40 top-20", // Mobile: fixed overlay
-            // Mobile: slide from right side
-            "lg:left-0 right-0 lg:right-auto",
+            "fixed lg:static inset-y-0 lg:left-0 z-40", // Mobile: fixed overlay
+            "top-[128px] lg:top-0", // Account for mobile menu height (80px + 48px = 128px)
+            // Mobile: full screen width
+            "w-full lg:w-56 xl:w-64 left-0 right-0 lg:right-auto",
             isLeftPanelOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0" // Mobile: slide in/out from right
           )}>
             {/* Close button removed - now handled by main menu button */}
                           <LeftPanel fixtures={fixtures || mockFixtures} />
           </div>
           
-          {/* Mobile Overlay */}
-          {isLeftPanelOpen && (
-            <div 
-              className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 top-20"
-              onClick={() => setIsLeftPanelOpen(false)}
-            />
-          )}
+          {/* Mobile Overlay - Removed since menu is now full screen */}
           
           {/* Middle Panel - Main Content - Now uses full available width */}
           <div className={cn(

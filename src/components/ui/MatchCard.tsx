@@ -31,10 +31,14 @@ export default function MatchCard({
   let displayPredictions: ModelPrediction[] = [];
   
   if (mode === 'homepage') {
-    // Show first 4 models (exclude BangaBot)
-    displayPredictions = fixture.modelPredictions
-      .filter(p => p.aiModel.name !== 'BangaBot')
-      .slice(0, 4);
+    // Show first 4 models (exclude BangaBot) in consistent order
+    const modelOrder = ['Gemini', 'ChatGPT', 'Grok', 'ML'];
+    const filteredPredictions = fixture.modelPredictions.filter(p => p.aiModel.name !== 'BangaBot');
+    
+    // Sort predictions to maintain consistent column order
+    displayPredictions = modelOrder
+      .map(modelName => filteredPredictions.find(p => p.aiModel.name === modelName))
+      .filter(Boolean) as ModelPrediction[];
   } else if (mode === 'market' && market) {
     // Show only predictions that qualify for this market
     displayPredictions = fixture.modelPredictions.filter(prediction => {
@@ -144,13 +148,25 @@ export default function MatchCard({
               })()}
             </div>
           ) : (
-            // Homepage, market, country pages: Show predictions with model names on mobile
+            // Homepage, market, country pages: Show predictions with model names and colors on mobile
             <div className="grid grid-cols-2 gap-2">
-              {displayPredictions.slice(0, 4).map((prediction) => (
-                <div
-                  key={prediction.aiModel.name}
-                  className="bg-gray-700 rounded-lg px-2 py-2 text-center border border-gray-600 hover:bg-gray-600 hover:border-gray-500 transition-all duration-200"
-                >
+              {displayPredictions.slice(0, 4).map((prediction) => {
+                // Same model-based color scheme for mobile consistency
+                const getModelColor = (modelName: string) => {
+                  const colors = {
+                    'Gemini': 'border-blue-500/50 bg-gradient-to-br from-gray-700 to-blue-900/30',
+                    'ChatGPT': 'border-green-500/50 bg-gradient-to-br from-gray-700 to-green-900/30', 
+                    'Grok': 'border-purple-500/50 bg-gradient-to-br from-gray-700 to-purple-900/30',
+                    'ML': 'border-orange-500/50 bg-gradient-to-br from-gray-700 to-orange-900/30'
+                  };
+                  return colors[modelName as keyof typeof colors] || 'border-gray-600 bg-gray-700';
+                };
+
+                return (
+                  <div
+                    key={prediction.aiModel.name}
+                    className={`rounded-lg px-2 py-2 text-center border hover:bg-gray-600 hover:border-gray-500 transition-all duration-200 ${getModelColor(prediction.aiModel.name)}`}
+                  >
                   <div className="text-xs text-gray-300 mb-1 font-semibold leading-tight">
                     {prediction.aiModel.name}
                   </div>
@@ -185,7 +201,8 @@ export default function MatchCard({
                     })()}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -242,17 +259,30 @@ export default function MatchCard({
         {/* Predictions - Context-Aware Cards */}
         <div>
           {mode === 'model' && selectedModel ? (
-            // Model page: Show individual market predictions
+            // Model page: Show individual market predictions with model color
             <div className="flex gap-2 flex-wrap">
               {(() => {
                 const prediction = displayPredictions[0];
                 if (!prediction) return null;
 
+                // Get model color for the cards
+                const getModelColor = (modelName: string) => {
+                  const colors = {
+                    'Gemini': 'border-blue-500/50 bg-gradient-to-br from-gray-700 to-blue-900/30',
+                    'ChatGPT': 'border-green-500/50 bg-gradient-to-br from-gray-700 to-green-900/30', 
+                    'Grok': 'border-purple-500/50 bg-gradient-to-br from-gray-700 to-purple-900/30',
+                    'ML': 'border-orange-500/50 bg-gradient-to-br from-gray-700 to-orange-900/30'
+                  };
+                  return colors[modelName as keyof typeof colors] || 'border-gray-600 bg-gray-700';
+                };
+
+                const modelColor = getModelColor(prediction.aiModel.name);
+
                 const qualifiedMarkets = getQualifiedMarkets(prediction);
                 return qualifiedMarkets.map((qm) => (
                   <div
                     key={qm.key}
-                    className="bg-gray-700 rounded-lg px-3 py-2 text-center min-w-[100px] border border-gray-600 hover:bg-gray-600 hover:border-gray-500 transition-all duration-200"
+                    className={`rounded-lg px-3 py-2 text-center min-w-[100px] border hover:bg-gray-600 hover:border-gray-500 transition-all duration-200 ${modelColor}`}
                   >
                     <div className="text-xs font-bold text-white whitespace-nowrap">
                       {qm.name}
@@ -262,52 +292,69 @@ export default function MatchCard({
               })()}
             </div>
           ) : (
-            // Homepage, market, country pages: Use Grid for Perfect Alignment
+            // Homepage, market, country pages: Use Grid for Perfect Alignment with Model-Based Colors
             <div className={`grid gap-2 ${mode === 'market' ? 'grid-cols-4 max-w-[380px]' : 'grid-cols-4'}`}>
-              {displayPredictions.slice(0, 4).map((prediction) => (
-                <div
-                  key={prediction.aiModel.name}
-                  className={`bg-gray-700 rounded-lg text-center border border-gray-600 hover:bg-gray-600 hover:border-gray-500 transition-all duration-200 flex flex-col items-center justify-center ${
-                    mode === 'market' ? 'px-3 py-3 min-w-[85px]' : 'px-3 py-3'
-                  }`}
-                >
-                  {mode === 'market' && (
-                    <div className="text-xs text-gray-300 mb-1 font-semibold leading-tight whitespace-nowrap">
-                      {prediction.aiModel.name}
+              {displayPredictions.slice(0, 4).map((prediction) => {
+                // Model-based color scheme for consistency across all pages
+                const getModelColor = (modelName: string) => {
+                  const colors = {
+                    'Gemini': 'border-blue-500/50 bg-gradient-to-br from-gray-700 to-blue-900/30',
+                    'ChatGPT': 'border-green-500/50 bg-gradient-to-br from-gray-700 to-green-900/30', 
+                    'Grok': 'border-purple-500/50 bg-gradient-to-br from-gray-700 to-purple-900/30',
+                    'ML': 'border-orange-500/50 bg-gradient-to-br from-gray-700 to-orange-900/30'
+                  };
+                  return colors[modelName as keyof typeof colors] || 'border-gray-600 bg-gray-700';
+                };
+
+                return (
+                  <div
+                    key={prediction.aiModel.name}
+                    className={`rounded-lg text-center border hover:bg-gray-600 hover:border-gray-500 transition-all duration-200 flex flex-col items-center justify-center ${
+                      mode === 'market' ? 'px-3 py-3 min-w-[85px]' : 'px-3 py-3'
+                    } ${getModelColor(prediction.aiModel.name)} group relative`}
+                    data-model={prediction.aiModel.name}
+                  >
+                    {/* Show model name only in market mode or on hover */}
+                    {mode === 'market' && (
+                      <div className="text-xs text-gray-300 mb-1 font-medium leading-tight whitespace-nowrap">
+                        {prediction.aiModel.name}
+                      </div>
+                    )}
+                    
+                    
+                    <div className="text-sm font-bold text-white transition-colors text-center leading-tight whitespace-nowrap">
+                      {(() => {
+                        // Debug prediction data
+                        if (prediction.aiModel.name === 'ChatGPT' || prediction.aiModel.name === 'Grok') {
+                          console.log(`🔍 ${prediction.aiModel.name} prediction data:`, {
+                            predictedHomeGoal: prediction.predictedHomeGoal,
+                            predictedAwayGoal: prediction.predictedAwayGoal,
+                            hasHomeGoal: typeof prediction.predictedHomeGoal !== 'undefined',
+                            hasAwayGoal: typeof prediction.predictedAwayGoal !== 'undefined'
+                          });
+                        }
+
+                        const displayValue = mode === 'homepage' || (mode === 'market' && !market?.includes('over') && !market?.includes('under')) ? (
+                          `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
+                        ) : mode === 'market' && market ? (
+                          getMarketDisplayValue(prediction, market)
+                        ) : (
+                          `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
+                        );
+
+                        // Fallback for missing data
+                        if (typeof prediction.predictedHomeGoal === 'undefined' ||
+                            typeof prediction.predictedAwayGoal === 'undefined') {
+                          console.log(`⚠️ ${prediction.aiModel.name} missing prediction data, showing fallback`);
+                          return '? - ?';
+                        }
+
+                        return displayValue;
+                      })()}
                     </div>
-                  )}
-                  <div className={`text-sm font-bold text-white transition-colors text-center leading-tight whitespace-nowrap ${mode === 'market' ? '' : 'mt-1'}`}>
-                    {(() => {
-                      // Debug prediction data
-                      if (prediction.aiModel.name === 'ChatGPT' || prediction.aiModel.name === 'Grok') {
-                        console.log(`🔍 ${prediction.aiModel.name} prediction data:`, {
-                          predictedHomeGoal: prediction.predictedHomeGoal,
-                          predictedAwayGoal: prediction.predictedAwayGoal,
-                          hasHomeGoal: typeof prediction.predictedHomeGoal !== 'undefined',
-                          hasAwayGoal: typeof prediction.predictedAwayGoal !== 'undefined'
-                        });
-                      }
-
-                      const displayValue = mode === 'homepage' || (mode === 'market' && !market?.includes('over') && !market?.includes('under')) ? (
-                        `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
-                      ) : mode === 'market' && market ? (
-                        getMarketDisplayValue(prediction, market)
-                      ) : (
-                        `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
-                      );
-
-                      // Fallback for missing data
-                      if (typeof prediction.predictedHomeGoal === 'undefined' ||
-                          typeof prediction.predictedAwayGoal === 'undefined') {
-                        console.log(`⚠️ ${prediction.aiModel.name} missing prediction data, showing fallback`);
-                        return '? - ?';
-                      }
-
-                      return displayValue;
-                    })()}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

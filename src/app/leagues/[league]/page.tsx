@@ -114,7 +114,7 @@ export default function LeaguePage({ params }: LeaguePageProps) {
         </div>
 
         {/* AI Models Header - Using MatchHeader for perfect alignment */}
-        <MatchHeader mode="homepage" />
+        <MatchHeader mode="country" />
 
         {/* Matches */}
         <div className="space-y-2">

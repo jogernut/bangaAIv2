@@ -139,11 +139,27 @@ export default function ModelPage() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
         <div>
           <div className="flex items-center space-x-3 mb-2">
-            {modelName === 'Bangabot' ? (
-              <Bot className="h-8 w-8 text-blue-500" />
-            ) : (
-              <Brain className="h-8 w-8 text-blue-500" />
-            )}
+            {(() => {
+              // Model-based color scheme
+              const getModelColor = (modelName: string) => {
+                const colors = {
+                  'Gemini': 'text-blue-500',
+                  'ChatGPT': 'text-green-500', 
+                  'Grok': 'text-purple-500',
+                  'ML': 'text-orange-500',
+                  'Bangabot': 'text-blue-500'
+                };
+                return colors[modelName as keyof typeof colors] || 'text-blue-500';
+              };
+              
+              const iconColor = getModelColor(modelName);
+              
+              return modelName === 'Bangabot' ? (
+                <Bot className={`h-8 w-8 ${iconColor}`} />
+              ) : (
+                <Brain className={`h-8 w-8 ${iconColor}`} />
+              );
+            })()}
             <h1 className="text-2xl font-bold text-white">
               {modelName} Predictions
             </h1>

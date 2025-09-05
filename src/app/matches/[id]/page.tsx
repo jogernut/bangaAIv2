@@ -420,7 +420,22 @@ export default function MatchDetailsPage() {
             <div className="lg:col-span-1">
               <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 lg:p-6">
                 <div className="flex items-center space-x-2 mb-4">
-                  <TrendingUp className="h-4 w-4 lg:h-5 lg:w-5 text-blue-500" />
+                  {(() => {
+                    // Model-based color scheme for consistency  
+                    const getModelColor = (modelName: string) => {
+                      const colors = {
+                        'Gemini': 'text-blue-500',
+                        'ChatGPT': 'text-green-500', 
+                        'Grok': 'text-purple-500',
+                        'ML': 'text-orange-500'
+                      };
+                      return colors[modelName as keyof typeof colors] || 'text-blue-500';
+                    };
+                    
+                    const modelColor = getModelColor(model.charAt(0).toUpperCase() + model.slice(1));
+                    
+                    return <TrendingUp className={`h-4 w-4 lg:h-5 lg:w-5 ${modelColor}`} />;
+                  })()}
                   <span className="font-medium text-white text-sm lg:text-base">
                     {model.charAt(0).toUpperCase() + model.slice(1)} Prediction
                   </span>
@@ -488,21 +503,55 @@ export default function MatchDetailsPage() {
         ) : (
           /* Other referrers - mobile-friendly grid layout */
           <div className="grid gap-3 lg:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            {relevantPredictions.map((prediction) => (
-              <button
-                key={prediction.aiModel.name}
-                onClick={() => setSelectedPrediction(prediction.aiModel.name)}
-                className={cn(
-                  "bg-gray-800 border rounded-lg p-3 lg:p-4 text-left transition-colors",
-                  selectedPrediction === prediction.aiModel.name
-                    ? "border-blue-500 bg-blue-900/20"
-                    : "border-gray-700 hover:border-gray-600"
-                )}
-              >
-                <div className="flex items-center space-x-2 mb-3">
-                  <TrendingUp className="h-4 w-4 text-blue-500" />
-                  <span className="font-medium text-white text-sm lg:text-base">{prediction.aiModel.name}</span>
-                </div>
+            {relevantPredictions.map((prediction) => {
+              // Model-based color scheme for consistency
+              const getModelColors = (modelName: string) => {
+                const colors = {
+                  'Gemini': {
+                    icon: 'text-blue-500',
+                    border: 'border-blue-500',
+                    bg: 'bg-blue-900/20'
+                  },
+                  'ChatGPT': {
+                    icon: 'text-green-500',
+                    border: 'border-green-500', 
+                    bg: 'bg-green-900/20'
+                  },
+                  'Grok': {
+                    icon: 'text-purple-500',
+                    border: 'border-purple-500',
+                    bg: 'bg-purple-900/20'
+                  },
+                  'ML': {
+                    icon: 'text-orange-500',
+                    border: 'border-orange-500',
+                    bg: 'bg-orange-900/20'
+                  }
+                };
+                return colors[modelName as keyof typeof colors] || {
+                  icon: 'text-blue-500',
+                  border: 'border-blue-500',
+                  bg: 'bg-blue-900/20'
+                };
+              };
+
+              const modelColors = getModelColors(prediction.aiModel.name);
+
+              return (
+                <button
+                  key={prediction.aiModel.name}
+                  onClick={() => setSelectedPrediction(prediction.aiModel.name)}
+                  className={cn(
+                    "bg-gray-800 border rounded-lg p-3 lg:p-4 text-left transition-colors",
+                    selectedPrediction === prediction.aiModel.name
+                      ? `${modelColors.border} ${modelColors.bg}`
+                      : "border-gray-700 hover:border-gray-600"
+                  )}
+                >
+                  <div className="flex items-center space-x-2 mb-3">
+                    <TrendingUp className={`h-4 w-4 ${modelColors.icon}`} />
+                    <span className="font-medium text-white text-sm lg:text-base">{prediction.aiModel.name}</span>
+                  </div>
                 
                 <div className="space-y-2">
                   <div className="text-center">
@@ -537,7 +586,8 @@ export default function MatchDetailsPage() {
                   )}
                 </div>
               </button>
-            ))}
+              );
+            })}
           </div>
         )}
         
