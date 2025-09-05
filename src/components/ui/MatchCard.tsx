@@ -128,17 +128,30 @@ export default function MatchCard({
         {/* Bottom Row: Predictions (2 per row) */}
         <div>
           {mode === 'model' && selectedModel ? (
-            // Model page: Show individual market predictions
+            // Model page: Show individual market predictions with model color coding
             <div className="grid grid-cols-2 gap-2">
               {(() => {
                 const prediction = displayPredictions[0];
                 if (!prediction) return null;
 
+                // Get model color for the selected model
+                const getModelColor = (modelName: string) => {
+                  const colors = {
+                    'Gemini': 'border-blue-500/50 bg-gradient-to-br from-gray-700 to-blue-900/30',
+                    'ChatGPT': 'border-green-500/50 bg-gradient-to-br from-gray-700 to-green-900/30',
+                    'Grok': 'border-purple-500/50 bg-gradient-to-br from-gray-700 to-purple-900/30',
+                    'ML': 'border-orange-500/50 bg-gradient-to-br from-gray-700 to-orange-900/30'
+                  };
+                  return colors[modelName as keyof typeof colors] || 'border-gray-600 bg-gray-700';
+                };
+
+                const modelColor = getModelColor(selectedModel);
+
                 const qualifiedMarkets = getQualifiedMarkets(prediction);
                 return qualifiedMarkets.slice(0, 4).map((qm) => (
                   <div
                     key={qm.key}
-                    className="bg-gray-700 rounded-lg px-2 py-2 text-center border border-gray-600 hover:bg-gray-600 hover:border-gray-500 transition-all duration-200"
+                    className={`rounded-lg px-2 py-2 text-center border hover:bg-gray-600 hover:border-gray-500 transition-all duration-200 ${modelColor}`}
                   >
                     <div className="text-xs font-bold text-white whitespace-nowrap">
                       {qm.name}

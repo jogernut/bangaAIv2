@@ -481,22 +481,57 @@ export default function MatchDetailsPage() {
               </div>
               
               <div className="grid gap-2 lg:gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-                {relevantMarkets.map((marketData) => (
-                  <button
-                    key={marketData.key}
-                    onClick={() => setSelectedPrediction(marketData.key)}
-                    className={cn(
-                      "bg-gray-800 border rounded-lg p-2 lg:p-3 text-center transition-colors",
-                      selectedPrediction === marketData.key
-                        ? "border-blue-500 bg-blue-900/20"
-                        : "border-gray-700 hover:border-gray-600"
-                    )}
-                  >
-                    <div className="text-xs lg:text-sm font-medium text-white">
-                      {marketData.name}
-                    </div>
-                  </button>
-                ))}
+                {relevantMarkets.map((marketData) => {
+                  // Model-based color scheme for market cards - matching the selected model
+                  const getModelColors = (modelName: string) => {
+                    const colors = {
+                      'Gemini': {
+                        border: 'border-blue-500/50',
+                        bg: 'bg-gradient-to-br from-gray-800 to-blue-900/30',
+                        selectedBg: 'bg-gradient-to-br from-blue-900/40 to-blue-800/30'
+                      },
+                      'ChatGPT': {
+                        border: 'border-green-500/50',
+                        bg: 'bg-gradient-to-br from-gray-800 to-green-900/30',
+                        selectedBg: 'bg-gradient-to-br from-green-900/40 to-green-800/30'
+                      },
+                      'Grok': {
+                        border: 'border-purple-500/50',
+                        bg: 'bg-gradient-to-br from-gray-800 to-purple-900/30',
+                        selectedBg: 'bg-gradient-to-br from-purple-900/40 to-purple-800/30'
+                      },
+                      'ML': {
+                        border: 'border-orange-500/50',
+                        bg: 'bg-gradient-to-br from-gray-800 to-orange-900/30',
+                        selectedBg: 'bg-gradient-to-br from-orange-900/40 to-orange-800/30'
+                      }
+                    };
+                    return colors[modelName as keyof typeof colors] || {
+                      border: 'border-blue-500/50',
+                      bg: 'bg-gradient-to-br from-gray-800 to-blue-900/30',
+                      selectedBg: 'bg-gradient-to-br from-blue-900/40 to-blue-800/30'
+                    };
+                  };
+
+                  const modelColors = getModelColors(model.charAt(0).toUpperCase() + model.slice(1));
+
+                  return (
+                    <button
+                      key={marketData.key}
+                      onClick={() => setSelectedPrediction(marketData.key)}
+                      className={cn(
+                        "border rounded-lg p-2 lg:p-3 text-center transition-all duration-200 hover:scale-[1.02]",
+                        selectedPrediction === marketData.key
+                          ? `${modelColors.border} ${modelColors.selectedBg}`
+                          : `${modelColors.border} ${modelColors.bg} hover:border-gray-500`
+                      )}
+                    >
+                      <div className="text-xs lg:text-sm font-medium text-white">
+                        {marketData.name}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -504,34 +539,39 @@ export default function MatchDetailsPage() {
           /* Other referrers - mobile-friendly grid layout */
           <div className="grid gap-3 lg:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {relevantPredictions.map((prediction) => {
-              // Model-based color scheme for consistency
+              // Model-based color scheme for consistency - matching MatchCard colors
               const getModelColors = (modelName: string) => {
                 const colors = {
                   'Gemini': {
                     icon: 'text-blue-500',
-                    border: 'border-blue-500',
-                    bg: 'bg-blue-900/20'
+                    border: 'border-blue-500/50',
+                    bg: 'bg-gradient-to-br from-gray-800 to-blue-900/30',
+                    selectedBg: 'bg-gradient-to-br from-blue-900/40 to-blue-800/30'
                   },
                   'ChatGPT': {
                     icon: 'text-green-500',
-                    border: 'border-green-500', 
-                    bg: 'bg-green-900/20'
+                    border: 'border-green-500/50',
+                    bg: 'bg-gradient-to-br from-gray-800 to-green-900/30',
+                    selectedBg: 'bg-gradient-to-br from-green-900/40 to-green-800/30'
                   },
                   'Grok': {
                     icon: 'text-purple-500',
-                    border: 'border-purple-500',
-                    bg: 'bg-purple-900/20'
+                    border: 'border-purple-500/50',
+                    bg: 'bg-gradient-to-br from-gray-800 to-purple-900/30',
+                    selectedBg: 'bg-gradient-to-br from-purple-900/40 to-purple-800/30'
                   },
                   'ML': {
                     icon: 'text-orange-500',
-                    border: 'border-orange-500',
-                    bg: 'bg-orange-900/20'
+                    border: 'border-orange-500/50',
+                    bg: 'bg-gradient-to-br from-gray-800 to-orange-900/30',
+                    selectedBg: 'bg-gradient-to-br from-orange-900/40 to-orange-800/30'
                   }
                 };
                 return colors[modelName as keyof typeof colors] || {
                   icon: 'text-blue-500',
-                  border: 'border-blue-500',
-                  bg: 'bg-blue-900/20'
+                  border: 'border-blue-500/50',
+                  bg: 'bg-gradient-to-br from-gray-800 to-blue-900/30',
+                  selectedBg: 'bg-gradient-to-br from-blue-900/40 to-blue-800/30'
                 };
               };
 
@@ -542,10 +582,10 @@ export default function MatchDetailsPage() {
                   key={prediction.aiModel.name}
                   onClick={() => setSelectedPrediction(prediction.aiModel.name)}
                   className={cn(
-                    "bg-gray-800 border rounded-lg p-3 lg:p-4 text-left transition-colors",
+                    "border rounded-lg p-3 lg:p-4 text-left transition-all duration-200 hover:scale-[1.02]",
                     selectedPrediction === prediction.aiModel.name
-                      ? `${modelColors.border} ${modelColors.bg}`
-                      : "border-gray-700 hover:border-gray-600"
+                      ? `${modelColors.border} ${modelColors.selectedBg}`
+                      : `${modelColors.border} ${modelColors.bg} hover:border-gray-500`
                   )}
                 >
                   <div className="flex items-center space-x-2 mb-3">
