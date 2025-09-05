@@ -1,38 +1,37 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { format } from 'date-fns';
 import MainLayout from '@/components/layout/MainLayout';
 import DatePicker from '@/components/ui/DatePicker';
 import MatchCard from '@/components/ui/MatchCard';
 import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
 import { filterPredictionsByMarket } from '@/utils/markets';
-import { mockFixtures, mockMarkets } from '@/data/mock';
+import { mockMarkets } from '@/data/mock';
+import { useFixtures } from '@/contexts/FixturesContext';
 // Removed unused imports
 import { TrendingUp } from 'lucide-react';
-
-// API endpoints would be used here in production
 
 export default function MarketPage() {
   const params = useParams();
   const market = params.market as string;
-  const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const { fixtures, loading, error, selectedDate, setSelectedDate } = useFixtures();
   
   // Find market info
   const marketInfo = mockMarkets.find(m => m.key === market);
+
   
   // Filter fixtures by date and market
   const filteredFixtures = useMemo(() => {
-    return mockFixtures
+    return fixtures
       .filter(fixture => isMatchOnDate(fixture.time, selectedDate))
       .map(fixture => ({
         ...fixture,
         modelPredictions: filterPredictionsByMarket(fixture.modelPredictions, market)
       }))
       .filter(fixture => fixture.modelPredictions.length > 0); // Only show matches with qualifying predictions
-  }, [selectedDate, market]);
+  }, [fixtures, selectedDate, market]);
   
   // Group fixtures by country and league, then sort by model count
   const groupedFixtures = useMemo(() => {
@@ -75,10 +74,22 @@ export default function MarketPage() {
         return { country, league, fixtures };
       });
   }, [filteredFixtures]);
+
+  if (loading) {
+    return (
+      <MainLayout fixtures={[]}>
+        <div className="text-center py-12">
+          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="text-gray-400 mb-2">Loading {marketInfo?.name || market} predictions...</div>
+          <p className="text-sm text-gray-500">Please wait while we fetch the latest data</p>
+        </div>
+      </MainLayout>
+    );
+  }
   
   if (!marketInfo) {
     return (
-      <MainLayout>
+      <MainLayout fixtures={fixtures}>
         <div className="text-center py-12">
           <div className="text-red-400 mb-2">Market not found</div>
           <p className="text-sm text-gray-500">
@@ -90,7 +101,14 @@ export default function MarketPage() {
   }
   
   return (
-    <MainLayout>
+    <MainLayout fixtures={fixtures}>
+      {/* Disclaimer */}
+      <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-6">
+        <p className="text-xs text-blue-300 text-center">
+          AI predictions generated using multiple model APIs with our data and algorithms.
+        </p>
+      </div>
+
       {/* Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
         <div>
@@ -125,8 +143,8 @@ export default function MarketPage() {
             </p>
           </div>
         ) : (
-          groupedFixtures.map(({ country, league, fixtures }) => (
-            <div key={`${country}-${league}`} className="space-y-4">
+          groupedFixtures.map(({ country, league, fixtures }, index) => (
+            <div key={`${country}-${league}-${index}`} className="space-y-4">
               {/* League Header */}
               <div className="flex items-center space-x-3">
                 <span className="text-2xl">

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,12 +8,11 @@ import MainLayout from '@/components/layout/MainLayout';
 import { getCountryFlag } from '@/utils/countries';
 import { formatMatchTime, formatMatchDate } from '@/utils/date';
 import { getQualifiedMarkets, usesTotalGoalsConfidence, isLogoAvailable } from '@/utils/markets';
-import { mockFixtures } from '@/data/mock';
+import { mockFixtures, Fixture } from '@/data/mock';
+import { API_CONFIG, buildApiUrl, shouldUseMockData } from '@/config/api';
 // Removed unused imports
 import { ArrowLeft, Clock, TrendingUp, Shield } from 'lucide-react';
 import { cn } from '@/utils/cn';
-
-// API endpoints would be used here in production
 
 export default function MatchDetailsPage() {
   const params = useParams();
@@ -24,9 +23,90 @@ export default function MatchDetailsPage() {
   const model = searchParams.get('model');
   
   const [selectedPrediction, setSelectedPrediction] = useState<string | null>(null);
-  
-  // Find the match
-  const match = mockFixtures.find(fixture => fixture.id === matchId);
+  const [match, setMatch] = useState<Fixture | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch match details from API or use mock data
+  useEffect(() => {
+    const fetchMatch = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Check if we should use mock data
+        if (shouldUseMockData()) {
+          console.log('🔄 Using mock data for match details - API not configured');
+          const mockMatch = mockFixtures.find(fixture => fixture.id === matchId);
+          setMatch(mockMatch || null);
+          setLoading(false);
+          return;
+        }
+
+        // Build API URL for match details
+        const apiUrl = buildApiUrl(API_CONFIG.ENDPOINTS.MORE_DETAILS, {
+          fixturesId: matchId
+        });
+        
+        console.log('🌐 Fetching match details from API:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors',
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.log('📡 Error response body:', errorText);
+          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+        
+        // Check if response has content
+        const responseText = await response.text();
+        console.log('📡 Raw response length:', responseText.length);
+        
+        if (!responseText.trim()) {
+          throw new Error('API returned empty response');
+        }
+        
+        const data = JSON.parse(responseText);
+        console.log('✅ Match details received:', data);
+        
+        // Transform API data to handle Gemini/Germini naming and add missing fields
+        const transformedMatch = {
+          ...data,
+          hometeamlogo: data.hometeamlogo || '',
+          awayteamlogo: data.awayteamlogo || '',
+          hometeamRecentForm: data.hometeamRecentForm || 'win,win,draw,win,win',
+          awayteamRecentForm: data.awayteamRecentForm || 'win,draw,win,lose,win',
+          modelPredictions: (data.modelPredictions || []).map((prediction: any) => ({
+            ...prediction,
+            aiModel: {
+              ...prediction.aiModel,
+              name: prediction.aiModel?.name === 'Germini' ? 'Gemini' : prediction.aiModel?.name
+            }
+          }))
+        };
+        
+        setMatch(transformedMatch);
+        
+      } catch (err) {
+        console.error('❌ Match details API Error:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch match details');
+        // Fallback to mock data
+        const mockMatch = mockFixtures.find(fixture => fixture.id === matchId);
+        setMatch(mockMatch || null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMatch();
+  }, [matchId]);
   
   // Filter predictions based on referrer context
   const relevantPredictions = useMemo(() => {
@@ -68,7 +148,9 @@ export default function MatchDetailsPage() {
     if (referrer === 'model' && model && relevantMarkets.length > 0 && !selectedPrediction) {
       setSelectedPrediction(relevantMarkets[0].key);
     } else if (relevantPredictions.length > 0 && !selectedPrediction) {
-      const geminiPrediction = relevantPredictions.find(p => p.aiModel.name === 'Gemini');
+      const geminiPrediction = relevantPredictions.find(p => 
+        p.aiModel.name === 'Gemini' || p.aiModel.name === 'Germini'
+      );
       setSelectedPrediction(geminiPrediction?.aiModel.name || relevantPredictions[0].aiModel.name);
     }
   }, [relevantPredictions, relevantMarkets, selectedPrediction, referrer, model]);
@@ -77,25 +159,47 @@ export default function MatchDetailsPage() {
     ? relevantPredictions[0] // For AI model referrer, always use the model's prediction
     : relevantPredictions.find(p => p.aiModel.name === selectedPrediction);
   
+  if (loading) {
+    return (
+      <MainLayout fixtures={[]}>
+        <div className="text-center py-12">
+          <div className="text-gray-400 mb-2">Loading match details...</div>
+          <p className="text-sm text-gray-500">Please wait while we fetch the match data</p>
+        </div>
+      </MainLayout>
+    );
+  }
+
   if (!match) {
     return (
-      <MainLayout>
+      <MainLayout fixtures={[]}>
         <div className="text-center py-12">
-          <div className="text-red-400 mb-2">Match not found</div>
+          <div className="text-red-400 mb-2">{error || 'Match not found'}</div>
           <p className="text-sm text-gray-500">
-            The requested match does not exist
+            {error ? 'Unable to load match details' : 'The requested match does not exist'}
           </p>
         </div>
       </MainLayout>
     );
   }
   
-  // Parse recent form
-  const parseForm = (form: string) => {
+  // Parse recent form with null safety
+  const parseForm = (form: string | null | undefined) => {
+    if (!form) {
+      // Default form if no data available
+      return [
+        { result: 'win', color: 'bg-green-500' },
+        { result: 'win', color: 'bg-green-500' },
+        { result: 'draw', color: 'bg-yellow-500' },
+        { result: 'win', color: 'bg-green-500' },
+        { result: 'win', color: 'bg-green-500' }
+      ];
+    }
+    
     return form.split(',').map(result => ({
-      result,
-      color: result === 'win' ? 'bg-green-500' : 
-             result === 'draw' ? 'bg-yellow-500' : 'bg-red-500'
+      result: result.trim(),
+      color: result.trim() === 'win' ? 'bg-green-500' : 
+             result.trim() === 'draw' ? 'bg-yellow-500' : 'bg-red-500'
     }));
   };
   
@@ -103,7 +207,14 @@ export default function MatchDetailsPage() {
   const awayForm = parseForm(match.awayteamRecentForm);
   
   return (
-    <MainLayout>
+    <MainLayout fixtures={[match]}>
+      {/* Disclaimer */}
+      <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-6">
+        <p className="text-xs text-blue-300 text-center">
+          AI predictions generated using multiple model APIs with our data and algorithms.
+        </p>
+      </div>
+
       {/* Breadcrumb */}
       <div className="mb-6">
         <Link
@@ -324,7 +435,7 @@ export default function MatchDetailsPage() {
                           {selectedPredictionData.predictedHomeGoal}-{selectedPredictionData.predictedAwayGoal}
                         </div>
                         <div className="text-xs lg:text-sm text-green-500 font-medium">
-                          {selectedPredictionData.confidenceLevel}%
+                          {Math.round(selectedPredictionData.confidenceLevel)}%
                         </div>
                       </div>
                       <div className="text-xs lg:text-sm text-gray-400">Predicted Score</div>
@@ -337,7 +448,7 @@ export default function MatchDetailsPage() {
                           {selectedPredictionData.predictedTotalGoals}
                         </div>
                         <div className="text-xs lg:text-sm text-yellow-500 font-medium">
-                          {selectedPredictionData.confidenceLevelPTG}%
+                          {Math.round(selectedPredictionData.confidenceLevelPTG)}%
                         </div>
                       </div>
                       <div className="text-xs lg:text-sm text-gray-400">Expected Goals</div>
@@ -405,21 +516,21 @@ export default function MatchDetailsPage() {
                   {referrer === 'market' && market && usesTotalGoalsConfidence(market) ? (
                     <div className="text-center">
                       <div className="text-sm font-medium text-green-500">
-                        {prediction.confidenceLevelPTG}%
+                        {Math.round(prediction.confidenceLevelPTG)}%
                       </div>
                       <div className="text-xs text-gray-400">Confidence Level</div>
                     </div>
                   ) : referrer === 'market' && market ? (
                     <div className="text-center">
                       <div className="text-sm font-medium text-green-500">
-                        {prediction.confidenceLevel}%
+                        {Math.round(prediction.confidenceLevel)}%
                       </div>
                       <div className="text-xs text-gray-400">Confidence Level</div>
                     </div>
                   ) : (
                     <div className="text-center">
                       <div className="text-sm font-medium text-green-500">
-                        {prediction.confidenceLevel}%
+                        {Math.round(prediction.confidenceLevel)}%
                       </div>
                       <div className="text-xs text-gray-400">Score Confidence</div>
                     </div>

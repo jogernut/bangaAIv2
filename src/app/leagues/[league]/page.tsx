@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, use } from 'react';
+import React, { useState, useMemo, use, useEffect } from 'react';
 import { format } from 'date-fns';
 import MainLayout from '@/components/layout/MainLayout';
 import DatePicker from '@/components/ui/DatePicker';
@@ -8,10 +8,7 @@ import MatchCard from '@/components/ui/MatchCard';
 import MatchHeader from '@/components/ui/MatchHeader';
 import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
-import { mockFixtures } from '@/data/mock';
-// Removed unused import
-
-// API endpoints would be used here in production
+import { useFixtures } from '@/contexts/FixturesContext';
 
 interface LeaguePageProps {
   params: Promise<{
@@ -20,7 +17,7 @@ interface LeaguePageProps {
 }
 
 export default function LeaguePage({ params }: LeaguePageProps) {
-  const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const { fixtures, loading, error, selectedDate, setSelectedDate } = useFixtures();
   
   // Unwrap the async params
   const resolvedParams = use(params);
@@ -32,33 +29,46 @@ export default function LeaguePage({ params }: LeaguePageProps) {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
+
   // Find matching league name from fixtures
   const actualLeagueName = useMemo(() => {
-    const fixture = mockFixtures.find(f => 
+    const fixture = fixtures.find(f => 
       f.league.toLowerCase().replace(/\s+/g, '-') === leagueSlug
     );
     return fixture?.league || leagueName;
-  }, [leagueSlug, leagueName]);
+  }, [fixtures, leagueSlug, leagueName]);
 
   // Filter fixtures for this league and date
   const filteredFixtures = useMemo(() => {
-    return mockFixtures.filter(fixture => 
+    return fixtures.filter(fixture => 
       fixture.league.toLowerCase().replace(/\s+/g, '-') === leagueSlug &&
       isMatchOnDate(fixture.time, selectedDate)
     );
-  }, [leagueSlug, selectedDate]);
+  }, [fixtures, leagueSlug, selectedDate]);
 
   // Get country for this league
   const leagueCountry = filteredFixtures.length > 0 ? filteredFixtures[0].country : '';
   
+  // Loading state
+  if (loading) {
+    return (
+      <MainLayout fixtures={[]}>
+        <div className="text-center py-12">
+          <div className="text-gray-400 mb-2">Loading {actualLeagueName} matches...</div>
+          <p className="text-sm text-gray-500">Please wait while we fetch the latest data</p>
+        </div>
+      </MainLayout>
+    );
+  }
+
   // Check if league exists in our data
-  const leagueExists = mockFixtures.some(fixture => 
+  const leagueExists = fixtures.some(fixture => 
     fixture.league.toLowerCase().replace(/\s+/g, '-') === leagueSlug
   );
 
   if (!leagueExists) {
     return (
-      <MainLayout>
+      <MainLayout fixtures={fixtures}>
         <div className="text-center py-12">
           <div className="text-red-400 mb-2">League not found</div>
           <p className="text-sm text-gray-500">
@@ -70,8 +80,15 @@ export default function LeaguePage({ params }: LeaguePageProps) {
   }
 
   return (
-    <MainLayout>
+    <MainLayout fixtures={fixtures}>
       <main className="p-3 lg:p-4">
+        {/* Disclaimer */}
+        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-6">
+          <p className="text-xs text-blue-300 text-center">
+            AI predictions generated using multiple model APIs with our data and algorithms.
+          </p>
+        </div>
+
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
           <div className="flex items-center space-x-3">

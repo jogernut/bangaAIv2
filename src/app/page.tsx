@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { format } from 'date-fns';
+import React, { useState, useMemo, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import DatePicker from '@/components/ui/DatePicker';
 import MatchCard from '@/components/ui/MatchCard';
@@ -9,30 +8,29 @@ import MatchHeader from '@/components/ui/MatchHeader';
 import { cn } from '@/utils/cn';
 import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
-import { mockFixtures, mockTopLeagues } from '@/data/mock';
-// Removed unused import
+import { sortLeaguesByPriority, sortCountriesByPriority } from '@/config/priorities';
+import { useFixtures } from '@/contexts/FixturesContext';
 import { Pin } from 'lucide-react';
 
-// API endpoints would be used here in production
-
 export default function HomePage() {
-  const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const { fixtures, loading, error, selectedDate, setSelectedDate } = useFixtures();
   const [pinnedLeagues, setPinnedLeagues] = useState<string[]>([]);
   
   // Load pinned leagues from session storage
-  React.useEffect(() => {
+  useEffect(() => {
     const saved = sessionStorage.getItem('pinnedLeagues');
     if (saved) {
       setPinnedLeagues(JSON.parse(saved));
     }
   }, []);
+
   
   // Filter fixtures by selected date
   const filteredFixtures = useMemo(() => {
-    return mockFixtures.filter(fixture => 
+    return fixtures.filter(fixture => 
       isMatchOnDate(fixture.time, selectedDate)
     );
-  }, [selectedDate]);
+  }, [fixtures, selectedDate]);
   
   // Group fixtures by country and league with priority and pinning logic
   const groupedFixtures = useMemo(() => {
@@ -60,11 +58,27 @@ export default function HomePage() {
       
       // Priority leagues next (if not pinned)
       if (!isPinnedA && !isPinnedB) {
-        const isPriorityA = mockTopLeagues.some(tl => tl.name === leagueA);
-        const isPriorityB = mockTopLeagues.some(tl => tl.name === leagueB);
+        // Use proper priority sorting
+        const allLeagues = Object.keys(groups).map(key => key.split('-')[1]);
+        const uniqueLeagues = [...new Set(allLeagues)];
+        const sortedByPriority = sortLeaguesByPriority(uniqueLeagues);
+        const indexA = sortedByPriority.indexOf(leagueA);
+        const indexB = sortedByPriority.indexOf(leagueB);
         
-        if (isPriorityA && !isPriorityB) return -1;
-        if (!isPriorityA && isPriorityB) return 1;
+        if (indexA !== indexB) {
+          return indexA - indexB;
+        }
+        
+        // If leagues have same priority, sort by country priority
+        const allCountries = Object.keys(groups).map(key => key.split('-')[0]);
+        const uniqueCountries = [...new Set(allCountries)];
+        const sortedCountriesByPriority = sortCountriesByPriority(uniqueCountries);
+        const countryIndexA = sortedCountriesByPriority.indexOf(countryA);
+        const countryIndexB = sortedCountriesByPriority.indexOf(countryB);
+        
+        if (countryIndexA !== countryIndexB) {
+          return countryIndexA - countryIndexB;
+        }
       }
       
       // Alphabetical by country then league
@@ -91,7 +105,7 @@ export default function HomePage() {
   };
   
   return (
-    <MainLayout>
+    <MainLayout fixtures={fixtures}>
       {/* Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 space-y-3 lg:space-y-0">
         <div>
@@ -99,7 +113,7 @@ export default function HomePage() {
             Football Predictions
           </h1>
           <p className="text-sm text-gray-400">
-            AI-powered predictions by the best models
+            AI-powered predictions using the best models
           </p>
         </div>
         
@@ -112,9 +126,43 @@ export default function HomePage() {
             {/* AI Models Header - Using MatchHeader for perfect alignment */}
       <MatchHeader mode="homepage" />
 
+      {/* Loading and Error States */}
+      {loading && (
+        <div className="text-center py-8">
+          <div className="text-gray-400 mb-2">Loading matches...</div>
+          <p className="text-sm text-gray-500">Please wait while we fetch the latest data</p>
+        </div>
+      )}
+      
+      {error && !loading && (
+        <div className="text-center py-8">
+          <div className="text-red-400 mb-2">⚠️ {error}</div>
+          <p className="text-sm text-gray-500">Using cached data instead</p>
+        </div>
+      )}
+
+      {/* Disclaimer */}
+      <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-6">
+        <p className="text-xs text-blue-300 text-center">
+          AI predictions generated using multiple model APIs with our data and algorithms.
+        </p>
+      </div>
+
       {/* Matches by League */}
       <div className="space-y-6">
-        {groupedFixtures.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="text-gray-400 mb-2">Loading predictions...</div>
+            <p className="text-sm text-gray-500">Please wait while we fetch the latest data</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <div className="text-red-400 mb-2">⚠️ Error loading data</div>
+            <p className="text-sm text-gray-500">{error}</p>
+            <p className="text-sm text-gray-500 mt-2">Showing sample data for demonstration</p>
+          </div>
+        ) : groupedFixtures.length === 0 ? (
           <div className="text-center py-8">
             <div className="text-gray-400 mb-2">No matches found for this date</div>
             <p className="text-sm text-gray-500">
@@ -122,8 +170,8 @@ export default function HomePage() {
             </p>
           </div>
         ) : (
-          groupedFixtures.map(({ country, league, fixtures }) => (
-            <div key={`${country}-${league}`} className="space-y-3">
+          groupedFixtures.map(({ country, league, fixtures }, index) => (
+            <div key={`${country}-${league}-${index}`} className="space-y-3">
               {/* League Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">

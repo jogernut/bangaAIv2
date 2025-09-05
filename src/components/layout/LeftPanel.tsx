@@ -8,7 +8,7 @@ import SearchBox from '@/components/ui/SearchBox';
 import { cn } from '@/utils/cn';
 import { getCountryFlag } from '@/utils/countries';
 import { mockMarkets, getUniqueLeagues, getUniqueCountries, type Fixture } from '@/data/mock';
-import { getTopPriorityLeagues, getTopPriorityCountries } from '@/config/priorities';
+import { getTopPriorityLeagues, getTopPriorityCountries, sortLeaguesByPriority, sortCountriesByPriority, MAX_PRIORITY_LEAGUES, MAX_PRIORITY_COUNTRIES } from '@/config/priorities';
 import { API_CONFIG } from '@/config/api';
 
 interface LeftPanelProps {
@@ -19,6 +19,8 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
   const pathname = usePathname();
   // const [searchQuery, setSearchQuery] = useState(''); // Will be used for search functionality
   const [pinnedLeagues, setPinnedLeagues] = useState<string[]>([]);
+  const [leaguesToShow, setLeaguesToShow] = useState(MAX_PRIORITY_LEAGUES);
+  const [countriesToShow, setCountriesToShow] = useState(MAX_PRIORITY_COUNTRIES);
   
   // Get pinned leagues from session storage on component mount
   React.useEffect(() => {
@@ -41,8 +43,14 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
   // Get dynamic data from fixtures
   const allLeagues = getUniqueLeagues(fixtures);
   const allCountries = getUniqueCountries(fixtures);
-  const topLeagues = getTopPriorityLeagues(allLeagues.map(l => l.league));
-  const topCountries = getTopPriorityCountries(allCountries);
+  
+  // Sort leagues and countries by priority
+  const sortedLeagues = sortLeaguesByPriority(allLeagues.map(l => l.league));
+  const sortedCountries = sortCountriesByPriority(allCountries);
+  
+  // Get leagues and countries to display (incrementally)
+  const displayedLeagues = sortedLeagues.slice(0, leaguesToShow);
+  const displayedCountries = sortedCountries.slice(0, countriesToShow);
   
   // AI Models for mobile navigation
   const aiModels = [
@@ -56,22 +64,25 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
     <div className="h-full flex flex-col">
       {/* Search Box */}
       <div className="p-4">
-        <SearchBox />
+        <SearchBox fixtures={fixtures} />
       </div>
       
       <div className="flex-1 overflow-y-auto">
         {/* Top Leagues */}
         <div className="px-4 mb-6">
           <h3 className="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">
-            Top Leagues
+            Leagues
           </h3>
           <div className="space-y-1">
-            {topLeagues.map((leagueName) => {
+            {displayedLeagues.map((leagueName, index) => {
               const leagueData = allLeagues.find(l => l.league === leagueName);
               if (!leagueData) return null;
               
+              // Count actual matches for this league
+              const matchCount = fixtures.filter(f => f.league === leagueName).length;
+              
               return (
-                <div key={leagueName} className="flex items-center justify-between group">
+                <div key={`${leagueName}-${index}`} className="flex items-center justify-between group">
                   <Link
                     href={`/leagues/${leagueName.toLowerCase().replace(/\s+/g, '-')}`}
                     className={cn(
@@ -85,6 +96,7 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
                       {getCountryFlag(leagueData.country)}
                     </span>
                     <span>{leagueName}</span>
+                    <span className="text-xs text-gray-500">({matchCount})</span>
                   </Link>
                   <button
                     onClick={() => togglePinnedLeague(leagueName)}
@@ -99,13 +111,14 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
                 </div>
               );
             })}
-            {allLeagues.length > topLeagues.length && (
-              <Link
-                href="/leagues"
-                className="block p-2 rounded-lg text-sm text-blue-600 hover:text-blue-300 transition-colors"
+            {/* View More Button */}
+            {leaguesToShow < sortedLeagues.length && (
+              <button
+                onClick={() => setLeaguesToShow(prev => Math.min(prev + 6, sortedLeagues.length))}
+                className="block w-full p-2 rounded-lg text-sm text-gray-400 hover:text-gray-300 hover:bg-gray-800 transition-colors text-left"
               >
-                View all leagues →
-              </Link>
+                View {Math.min(6, sortedLeagues.length - leaguesToShow)} more →
+              </button>
             )}
           </div>
         </div>
@@ -193,9 +206,11 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
             Countries
           </h3>
           <div className="space-y-1">
-            {topCountries.map((country) => (
+            {displayedCountries.map((country, index) => {
+              const countryMatches = fixtures.filter(f => f.country === country).length;
+              return (
               <Link
-                key={country}
+                key={`${country}-${index}`}
                 href={`/countries/${country.toLowerCase().replace(/\s+/g, '-')}`}
                 className={cn(
                   "flex items-center space-x-2 p-2 rounded-lg text-sm transition-colors",
@@ -208,15 +223,18 @@ export default function LeftPanel({ fixtures }: LeftPanelProps) {
                   {getCountryFlag(country)}
                 </span>
                 <span>{country}</span>
+                <span className="text-xs text-gray-500">({countryMatches})</span>
               </Link>
-            ))}
-            {allCountries.length > topCountries.length && (
-              <Link
-                href="/countries"
-                className="block p-2 rounded-lg text-sm text-blue-600 hover:text-blue-300 transition-colors"
+              );
+            })}
+            {/* View More Button */}
+            {countriesToShow < sortedCountries.length && (
+              <button
+                onClick={() => setCountriesToShow(prev => Math.min(prev + 5, sortedCountries.length))}
+                className="block w-full p-2 rounded-lg text-sm text-gray-400 hover:text-gray-300 hover:bg-gray-800 transition-colors text-left"
               >
-                View all countries →
-              </Link>
+                View {Math.min(5, sortedCountries.length - countriesToShow)} more →
+              </button>
             )}
           </div>
         </div>

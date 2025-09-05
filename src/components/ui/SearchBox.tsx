@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, X } from 'lucide-react';
-import { mockFixtures, mockMarkets, getUniqueLeagues, getUniqueCountries } from '@/data/mock';
+import { mockFixtures, mockMarkets, getUniqueLeagues, getUniqueCountries, Fixture } from '@/data/mock';
 import { getCountryFlag } from '@/utils/countries';
 
 interface SearchResult {
@@ -15,9 +15,10 @@ interface SearchResult {
 
 interface SearchBoxProps {
   className?: string;
+  fixtures?: Fixture[];
 }
 
-export default function SearchBox({ className }: SearchBoxProps) {
+export default function SearchBox({ className, fixtures = mockFixtures }: SearchBoxProps) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function SearchBox({ className }: SearchBoxProps) {
     const results: SearchResult[] = [];
 
     // Matches
-    mockFixtures.forEach(fixture => {
+    fixtures.forEach(fixture => {
       const matchName = `${fixture.hometeam} vs ${fixture.awayteam}`;
       results.push({
         type: 'match',
@@ -38,7 +39,7 @@ export default function SearchBox({ className }: SearchBoxProps) {
     });
 
     // Leagues
-    const leagues = getUniqueLeagues(mockFixtures);
+    const leagues = getUniqueLeagues(fixtures);
     leagues.forEach(({ league, country }) => {
       results.push({
         type: 'league',
@@ -49,7 +50,7 @@ export default function SearchBox({ className }: SearchBoxProps) {
     });
 
     // Countries
-    const countries = getUniqueCountries(mockFixtures);
+    const countries = getUniqueCountries(fixtures);
     countries.forEach(country => {
       results.push({
         type: 'country',
@@ -69,7 +70,7 @@ export default function SearchBox({ className }: SearchBoxProps) {
     });
 
     return results;
-  }, []);
+  }, [fixtures]);
 
   // Filter results based on query
   const filteredResults = useMemo(() => {

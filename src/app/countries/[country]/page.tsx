@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -10,16 +10,15 @@ import MatchCard from '@/components/ui/MatchCard';
 import MatchHeader from '@/components/ui/MatchHeader';
 import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
-import { mockFixtures } from '@/data/mock';
+import { useFixtures } from '@/contexts/FixturesContext';
+import { sortLeaguesByPriority } from '@/config/priorities';
 // Removed unused imports
 import { ArrowLeft, Pin, PinOff } from 'lucide-react';
-
-// API endpoints would be used here in production
 
 export default function CountryPage() {
   const params = useParams();
   const countrySlug = params.country as string;
-  const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const { fixtures, loading, error, selectedDate, setSelectedDate } = useFixtures();
   const [pinnedLeagues, setPinnedLeagues] = useState<string[]>([]);
   
   // Convert slug back to country name
@@ -28,20 +27,100 @@ export default function CountryPage() {
   ).join(' ');
   
   // Load pinned leagues from session storage
-  React.useEffect(() => {
+  useEffect(() => {
     const saved = sessionStorage.getItem('pinnedLeagues');
     if (saved) {
       setPinnedLeagues(JSON.parse(saved));
     }
   }, []);
+
+  // Fetch fixtures from API or use mock data
+  useEffect(() => {
+    const fetchFixtures = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Check if we should use mock data
+        if (shouldUseMockData()) {
+          console.log('🔄 Using mock data for country page - API not configured');
+          setFixtures(mockFixtures);
+          setLoading(false);
+          return;
+        }
+
+        // Build API URL - Convert date format from yyyy-MM-dd to MM/dd/yyyy
+        const [year, month, day] = selectedDate.split('-');
+        const apiDate = `${month}/${day}/${year}`;
+        
+        const apiUrl = buildApiUrl(API_CONFIG.ENDPOINTS.HOMEPAGE, {
+          date: apiDate
+        });
+        
+        console.log('🌐 Fetching country fixtures from API:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors',
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.log('📡 Error response body:', errorText);
+          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+        
+        // Check if response has content
+        const responseText = await response.text();
+        console.log('📡 Raw response length:', responseText.length);
+        
+        if (!responseText.trim()) {
+          throw new Error('API returned empty response');
+        }
+        
+        const data = JSON.parse(responseText);
+        console.log('✅ Country fixtures received:', data);
+        
+        // Transform API data to match our Fixture interface
+        const transformedFixtures = Array.isArray(data) ? data.map((match: any) => ({
+          ...match,
+          hometeamlogo: match.hometeamlogo || '',
+          awayteamlogo: match.awayteamlogo || '',
+          modelPredictions: (match.modelPredictions || []).map((prediction: any) => ({
+            ...prediction,
+            aiModel: {
+              ...prediction.aiModel,
+              name: prediction.aiModel?.name === 'Germini' ? 'Gemini' : prediction.aiModel?.name
+            }
+          }))
+        })) : [];
+        
+        setFixtures(transformedFixtures);
+        
+      } catch (err) {
+        console.error('❌ Country API Error:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch data');
+        // Fallback to mock data
+        setFixtures(mockFixtures);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFixtures();
+  }, [selectedDate]);
   
   // Filter fixtures by country and date
   const filteredFixtures = useMemo(() => {
-    return mockFixtures.filter(fixture => 
+    return fixtures.filter(fixture => 
       fixture.country.toLowerCase() === countryName.toLowerCase() &&
       isMatchOnDate(fixture.time, selectedDate)
     );
-  }, [countryName, selectedDate]);
+  }, [fixtures, countryName, selectedDate]);
   
   // Group fixtures by league with pinning logic
   const groupedFixtures = useMemo(() => {
@@ -54,7 +133,7 @@ export default function CountryPage() {
       groups[fixture.league].push(fixture);
     });
     
-    // Sort leagues: pinned first, then alphabetical
+    // Sort leagues: pinned first, then priority, then alphabetical
     const sortedGroups = Object.entries(groups).sort(([leagueA], [leagueB]) => {
       const isPinnedA = pinnedLeagues.includes(leagueA);
       const isPinnedB = pinnedLeagues.includes(leagueB);
@@ -63,7 +142,15 @@ export default function CountryPage() {
       if (isPinnedA && !isPinnedB) return -1;
       if (!isPinnedA && isPinnedB) return 1;
       
-      // Alphabetical
+      // If both pinned or both not pinned, use priority sorting
+      if (isPinnedA === isPinnedB) {
+        const allLeagues = Object.keys(groups);
+        const sortedByPriority = sortLeaguesByPriority(allLeagues);
+        const indexA = sortedByPriority.indexOf(leagueA);
+        const indexB = sortedByPriority.indexOf(leagueB);
+        return indexA - indexB;
+      }
+      
       return leagueA.localeCompare(leagueB);
     });
     
@@ -80,14 +167,26 @@ export default function CountryPage() {
     sessionStorage.setItem('pinnedLeagues', JSON.stringify(updated));
   };
   
+  // Loading state
+  if (loading) {
+    return (
+      <MainLayout fixtures={[]}>
+        <div className="text-center py-12">
+          <div className="text-gray-400 mb-2">Loading {countryName} matches...</div>
+          <p className="text-sm text-gray-500">Please wait while we fetch the latest data</p>
+        </div>
+      </MainLayout>
+    );
+  }
+
   // Check if country exists in our data
-  const countryExists = mockFixtures.some(fixture => 
+  const countryExists = fixtures.some(fixture => 
     fixture.country.toLowerCase() === countryName.toLowerCase()
   );
   
   if (!countryExists) {
     return (
-      <MainLayout>
+      <MainLayout fixtures={fixtures}>
         <div className="mb-6">
           <Link
             href="/countries"
@@ -109,7 +208,14 @@ export default function CountryPage() {
   }
   
   return (
-    <MainLayout>
+    <MainLayout fixtures={fixtures}>
+      {/* Disclaimer */}
+      <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-6">
+        <p className="text-xs text-blue-300 text-center">
+          AI predictions generated using multiple model APIs with our data and algorithms.
+        </p>
+      </div>
+
       {/* Breadcrumb */}
       <div className="mb-6">
         <Link

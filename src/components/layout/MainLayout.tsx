@@ -6,14 +6,15 @@ import LeftPanel from './LeftPanel';
 import RightPanel from './RightPanel';
 import TopMenu from './TopMenu';
 import { Menu, X } from 'lucide-react';
-import { mockFixtures } from '@/data/mock';
+import { mockFixtures, Fixture } from '@/data/mock';
 
 interface MainLayoutProps {
   children: React.ReactNode;
   className?: string;
+  fixtures?: Fixture[];
 }
 
-export default function MainLayout({ children, className }: MainLayoutProps) {
+export default function MainLayout({ children, className, fixtures }: MainLayoutProps) {
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(false);
   
   return (
@@ -50,7 +51,7 @@ export default function MainLayout({ children, className }: MainLayoutProps) {
             isLeftPanelOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0" // Mobile: slide in/out from right
           )}>
             {/* Close button removed - now handled by main menu button */}
-                          <LeftPanel fixtures={mockFixtures} />
+                          <LeftPanel fixtures={fixtures || mockFixtures} />
           </div>
           
           {/* Mobile Overlay */}

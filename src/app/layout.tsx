@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { FixturesProvider } from "@/contexts/FixturesContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,8 +29,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body
         className={`${inter.variable} font-sans antialiased bg-gray-950 text-white`}
+        suppressHydrationWarning={true}
       >
-        {children}
+        <FixturesProvider>
+          {children}
+        </FixturesProvider>
       </body>
     </html>
   );

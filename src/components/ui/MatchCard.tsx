@@ -42,10 +42,17 @@ export default function MatchCard({
       return qualifiedMarkets.some(qm => qm.key === market);
     });
   } else if (mode === 'model' && selectedModel) {
-    // Show only the selected model
+    // Show only the selected model (case-insensitive)
     displayPredictions = fixture.modelPredictions.filter(
-      p => p.aiModel.name === selectedModel
+      p => p.aiModel.name.toLowerCase() === selectedModel.toLowerCase()
     );
+
+    // Debug: Log what we're filtering for (only for problematic models)
+    if (selectedModel === 'ChatGPT' || selectedModel === 'Grok') {
+      console.log(`🔍 MatchCard: Mode=${mode}, Selected=${selectedModel}, Available models:`,
+        fixture.modelPredictions.map(p => p.aiModel.name));
+      console.log(`🔍 MatchCard: Filtered predictions:`, displayPredictions.length);
+    }
   }
   
   const detailsUrl = `/matches/${fixture.id}?ref=${mode}${market ? `&market=${market}` : ''}${selectedModel ? `&model=${selectedModel}` : ''}`;
@@ -148,13 +155,34 @@ export default function MatchCard({
                     {prediction.aiModel.name}
                   </div>
                   <div className="text-xs font-bold text-white transition-colors text-center leading-tight">
-                    {mode === 'homepage' || (mode === 'market' && !market?.includes('over') && !market?.includes('under')) ? (
-                      `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
-                    ) : mode === 'market' && market ? (
-                      getMarketDisplayValue(prediction, market)
-                    ) : (
-                      `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
-                    )}
+                    {(() => {
+                      // Debug prediction data for mobile too
+                      if (prediction.aiModel.name === 'ChatGPT' || prediction.aiModel.name === 'Grok') {
+                        console.log(`🔍 Mobile ${prediction.aiModel.name} prediction data:`, {
+                          predictedHomeGoal: prediction.predictedHomeGoal,
+                          predictedAwayGoal: prediction.predictedAwayGoal,
+                          hasHomeGoal: typeof prediction.predictedHomeGoal !== 'undefined',
+                          hasAwayGoal: typeof prediction.predictedAwayGoal !== 'undefined'
+                        });
+                      }
+
+                      const displayValue = mode === 'homepage' || (mode === 'market' && !market?.includes('over') && !market?.includes('under')) ? (
+                        `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
+                      ) : mode === 'market' && market ? (
+                        getMarketDisplayValue(prediction, market)
+                      ) : (
+                        `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
+                      );
+
+                      // Fallback for missing data
+                      if (typeof prediction.predictedHomeGoal === 'undefined' ||
+                          typeof prediction.predictedAwayGoal === 'undefined') {
+                        console.log(`⚠️ Mobile ${prediction.aiModel.name} missing prediction data, showing fallback`);
+                        return '? - ?';
+                      }
+
+                      return displayValue;
+                    })()}
                   </div>
                 </div>
               ))}
@@ -164,7 +192,7 @@ export default function MatchCard({
       </div>
 
       {/* Desktop Layout: Original Grid */}
-      <div className="hidden md:grid md:grid-cols-[60px_1fr_320px_20px] gap-6 items-center">
+      <div className="hidden md:grid md:grid-cols-[60px_1fr_400px_20px] gap-6 items-center">
         {/* Time */}
         <div className="text-center">
           <div className="text-sm font-medium text-white transition-colors">{matchTime}</div>
@@ -235,12 +263,12 @@ export default function MatchCard({
             </div>
           ) : (
             // Homepage, market, country pages: Use Grid for Perfect Alignment
-            <div className={`grid gap-3 ${mode === 'market' ? 'grid-cols-[1fr_1fr_1fr_1fr] max-w-[400px]' : 'grid-cols-4'}`}>
+            <div className={`grid gap-2 ${mode === 'market' ? 'grid-cols-4 max-w-[380px]' : 'grid-cols-4'}`}>
               {displayPredictions.slice(0, 4).map((prediction) => (
                 <div
                   key={prediction.aiModel.name}
                   className={`bg-gray-700 rounded-lg text-center border border-gray-600 hover:bg-gray-600 hover:border-gray-500 transition-all duration-200 flex flex-col items-center justify-center ${
-                    mode === 'market' ? 'px-4 py-4 min-w-[90px]' : 'px-3 py-3'
+                    mode === 'market' ? 'px-3 py-3 min-w-[85px]' : 'px-3 py-3'
                   }`}
                 >
                   {mode === 'market' && (
@@ -249,13 +277,34 @@ export default function MatchCard({
                     </div>
                   )}
                   <div className={`text-sm font-bold text-white transition-colors text-center leading-tight whitespace-nowrap ${mode === 'market' ? '' : 'mt-1'}`}>
-                    {mode === 'homepage' || (mode === 'market' && !market?.includes('over') && !market?.includes('under')) ? (
-                      `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
-                    ) : mode === 'market' && market ? (
-                      getMarketDisplayValue(prediction, market)
-                    ) : (
-                      `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
-                    )}
+                    {(() => {
+                      // Debug prediction data
+                      if (prediction.aiModel.name === 'ChatGPT' || prediction.aiModel.name === 'Grok') {
+                        console.log(`🔍 ${prediction.aiModel.name} prediction data:`, {
+                          predictedHomeGoal: prediction.predictedHomeGoal,
+                          predictedAwayGoal: prediction.predictedAwayGoal,
+                          hasHomeGoal: typeof prediction.predictedHomeGoal !== 'undefined',
+                          hasAwayGoal: typeof prediction.predictedAwayGoal !== 'undefined'
+                        });
+                      }
+
+                      const displayValue = mode === 'homepage' || (mode === 'market' && !market?.includes('over') && !market?.includes('under')) ? (
+                        `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
+                      ) : mode === 'market' && market ? (
+                        getMarketDisplayValue(prediction, market)
+                      ) : (
+                        `${prediction.predictedHomeGoal}-${prediction.predictedAwayGoal}`
+                      );
+
+                      // Fallback for missing data
+                      if (typeof prediction.predictedHomeGoal === 'undefined' ||
+                          typeof prediction.predictedAwayGoal === 'undefined') {
+                        console.log(`⚠️ ${prediction.aiModel.name} missing prediction data, showing fallback`);
+                        return '? - ?';
+                      }
+
+                      return displayValue;
+                    })()}
                   </div>
                 </div>
               ))}

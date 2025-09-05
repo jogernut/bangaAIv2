@@ -5,18 +5,17 @@
  * on the homepage and in the left panel navigation.
  */
 
-// Top priority leagues that should appear first in the left panel
+// Top priority leagues from priority countries that should appear first
 export const PRIORITY_LEAGUES = [
-  'Premier League',
-  'LaLiga', 
-  'Bundesliga',
-  'Serie A',
-  'Ligue 1',
-  'Primeira Liga',
-  'Eredivisie',
-  'Champions League',
-  'Europa League',
-  'MLS'
+  'Premier League',  // England
+  'LaLiga',         // Spain
+  'Serie A',        // Italy
+  'Bundesliga',     // Germany
+  'Ligue 1',        // France
+  'Primeira Liga',  // Portugal
+  'Eredivisie',     // Netherlands
+  'Champions League', // World
+  'Europa League',    // World
 ] as const;
 
 // Top priority countries that should appear first in the left panel
