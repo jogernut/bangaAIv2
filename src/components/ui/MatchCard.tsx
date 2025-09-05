@@ -221,11 +221,11 @@ export default function MatchCard({
         </div>
       </div>
 
-      {/* Desktop Layout: Original Grid */}
-      <div className="hidden md:grid md:grid-cols-[60px_1fr_400px_20px] gap-6 items-center">
+      {/* Desktop Layout: Compact grid for 90% zoom effect */}
+      <div className="hidden md:grid md:grid-cols-[50px_1fr_350px_16px] gap-4 items-center">
         {/* Time */}
         <div className="text-center">
-          <div className="text-sm font-medium text-white transition-colors">{matchTime}</div>
+          <div className="text-xs lg:text-sm font-medium text-white transition-colors">{matchTime}</div>
         </div>
         
         {/* Teams */}
@@ -233,7 +233,7 @@ export default function MatchCard({
           {/* Home Team */}
           <div className="flex items-center space-x-2 mb-2">
             {isLogoAvailable(fixture.hometeamlogo) && (
-              <div className="w-5 h-5 relative flex-shrink-0">
+              <div className="w-4 h-4 lg:w-4 lg:h-4 relative flex-shrink-0">
                 <Image
                   src={fixture.hometeamlogo}
                   alt={`${fixture.hometeam} logo`}
@@ -246,13 +246,13 @@ export default function MatchCard({
                 />
               </div>
             )}
-            <span className="text-sm font-medium text-white truncate transition-colors">{fixture.hometeam}</span>
+            <span className="text-xs lg:text-sm font-medium text-white truncate transition-colors">{fixture.hometeam}</span>
           </div>
 
           {/* Away Team */}
           <div className="flex items-center space-x-2">
             {isLogoAvailable(fixture.awayteamlogo) && (
-              <div className="w-5 h-5 relative flex-shrink-0">
+              <div className="w-4 h-4 lg:w-4 lg:h-4 relative flex-shrink-0">
                 <Image
                   src={fixture.awayteamlogo}
                   alt={`${fixture.awayteam} logo`}
@@ -265,7 +265,7 @@ export default function MatchCard({
                 />
               </div>
             )}
-            <span className="text-sm font-medium text-white truncate transition-colors">{fixture.awayteam}</span>
+            <span className="text-xs lg:text-sm font-medium text-white truncate transition-colors">{fixture.awayteam}</span>
           </div>
         </div>
         
@@ -273,7 +273,7 @@ export default function MatchCard({
         <div>
           {mode === 'model' && selectedModel ? (
             // Model page: Show individual market predictions with model color
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap max-w-[350px]">
               {(() => {
                 const prediction = displayPredictions[0];
                 if (!prediction) return null;
@@ -306,7 +306,7 @@ export default function MatchCard({
             </div>
           ) : (
             // Homepage, market, country pages: Use Grid for Perfect Alignment with Model-Based Colors
-            <div className={`grid gap-2 ${mode === 'market' ? 'grid-cols-4 max-w-[380px]' : 'grid-cols-4'}`}>
+            <div className={`grid gap-2 ${mode === 'market' ? 'grid-cols-4 max-w-[350px]' : 'grid-cols-4'}`}>
               {displayPredictions.slice(0, 4).map((prediction) => {
                 // Model-based color scheme for consistency across all pages
                 const getModelColor = (modelName: string) => {
@@ -323,19 +323,19 @@ export default function MatchCard({
                   <div
                     key={prediction.aiModel.name}
                     className={`rounded-lg text-center border hover:bg-gray-600 hover:border-gray-500 transition-all duration-200 flex flex-col items-center justify-center ${
-                      mode === 'market' ? 'px-3 py-3 min-w-[85px]' : 'px-3 py-3'
+                      mode === 'market' ? 'px-2 py-2 min-w-[70px]' : 'px-2 py-2'
                     } ${getModelColor(prediction.aiModel.name)} group relative`}
                     data-model={prediction.aiModel.name}
                   >
                     {/* Show model name only in market mode or on hover */}
                     {mode === 'market' && (
-                      <div className="text-xs text-gray-300 mb-1 font-medium leading-tight whitespace-nowrap">
+                      <div className="text-xs lg:text-xs text-gray-300 mb-1 font-medium leading-tight whitespace-nowrap">
                         {prediction.aiModel.name}
                       </div>
                     )}
                     
                     
-                    <div className="text-sm font-bold text-white transition-colors text-center leading-tight whitespace-nowrap">
+                    <div className="text-xs lg:text-sm font-bold text-white transition-colors text-center leading-tight whitespace-nowrap">
                       {(() => {
                         // Debug prediction data
                         if (prediction.aiModel.name === 'ChatGPT' || prediction.aiModel.name === 'Grok') {

@@ -35,14 +35,14 @@ export default function MainLayout({ children, className, fixtures }: MainLayout
       
       {/* Mobile Models Menu - Below Top Bar */}
       <div className="lg:hidden bg-gray-900 border-b border-gray-800">
-        <div className="max-w-[1600px] mx-auto px-3">
-          <div className="flex items-stretch gap-1 py-3">
+        <div className="max-w-[1400px] mx-auto px-3">
+          <div className="flex items-stretch gap-1 py-2">
             {aiModels.map((model) => (
               <Link
                 key={model.name}
                 href={model.path}
                 className={cn(
-                  "flex-1 px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-center",
+                  "flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 text-center",
                   pathname === model.path
                     ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
                     : "text-gray-300 hover:text-white hover:bg-gray-800/80 bg-gray-800/50"
@@ -57,7 +57,7 @@ export default function MainLayout({ children, className, fixtures }: MainLayout
               href={API_CONFIG.BANGABOT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-1 flex-1 px-2 py-2 rounded-lg text-sm font-medium bg-white text-gray-900 hover:bg-gray-100 transition-colors border border-gray-300"
+              className="flex items-center justify-center space-x-1 flex-1 px-2 py-1.5 rounded-lg text-xs font-medium bg-white text-gray-900 hover:bg-gray-100 transition-colors border border-gray-300"
             >
               <Bot className="h-4 w-4" />
               <span>Bot</span>
@@ -80,8 +80,8 @@ export default function MainLayout({ children, className, fixtures }: MainLayout
         </button>
       </div>
 
-      {/* Container with proper site-wide padding */}
-      <div className="max-w-[1600px] mx-auto px-3 md:px-8 lg:px-16">
+      {/* Container with proper site-wide padding - smaller for 90% zoom effect */}
+      <div className="max-w-[1400px] mx-auto px-3 md:px-6 lg:px-12">
         
               {/* Main Content Area */}
       <div className="flex min-h-[calc(100vh-128px)] lg:min-h-[calc(100vh-80px)]">
@@ -106,7 +106,7 @@ export default function MainLayout({ children, className, fixtures }: MainLayout
             "flex-1 overflow-auto",
             className
           )}>
-            <main className="p-2 md:p-3 lg:p-4">
+            <main className="p-2 md:p-3 lg:p-3">
               {children}
             </main>
           </div>

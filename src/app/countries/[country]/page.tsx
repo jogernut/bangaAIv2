@@ -169,7 +169,7 @@ export default function CountryPage() {
       </div>
       
       {/* AI Models Header - Using MatchHeader for perfect alignment */}
-      <MatchHeader mode="country" />
+      <MatchHeader mode="country" fixtures={filteredFixtures} />
 
       {/* Matches by League */}
       <div className="space-y-8">

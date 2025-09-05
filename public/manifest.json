@@ -1,0 +1,20 @@
+{
+  "name": "Banga.ai - AI Football Predictions",
+  "short_name": "Banga.ai",
+  "description": "Advanced AI-powered football predictions and match analysis",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "categories": ["sports", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}

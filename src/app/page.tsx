@@ -11,6 +11,7 @@ import { isMatchOnDate } from '@/utils/date';
 import { sortLeaguesByPriority, sortCountriesByPriority } from '@/config/priorities';
 import { useFixtures } from '@/contexts/FixturesContext';
 import { Pin } from 'lucide-react';
+import Head from 'next/head';
 
 export default function HomePage() {
   const { fixtures, loading, error, selectedDate, setSelectedDate } = useFixtures();
@@ -104,15 +105,47 @@ export default function HomePage() {
     sessionStorage.setItem('pinnedLeagues', JSON.stringify(updated));
   };
   
+  // Structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SportsOrganization",
+    "name": "Banga.ai",
+    "description": "Advanced AI-powered football predictions and match analysis platform",
+    "url": "https://banga.ai",
+    "logo": "https://banga.ai/logo.png",
+    "sameAs": [
+      "https://twitter.com/banga_ai"
+    ],
+    "offers": {
+      "@type": "Offer",
+      "name": "AI Football Predictions",
+      "description": "Get accurate football match predictions powered by multiple AI models"
+    },
+    "serviceType": "Sports Prediction Service",
+    "areaServed": "Worldwide",
+    "provider": {
+      "@type": "Organization",
+      "name": "Banga.ai",
+      "description": "AI-powered sports prediction platform"
+    }
+  };
+
   return (
-    <MainLayout fixtures={fixtures}>
+    <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </Head>
+      <MainLayout fixtures={fixtures}>
       {/* Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 space-y-3 lg:space-y-0">
         <div>
           <h1 className="text-lg lg:text-xl font-bold text-white mb-1">
             Football Predictions
           </h1>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm lg:text-sm text-gray-400">
             AI-powered predictions using the best models
           </p>
         </div>
@@ -124,7 +157,7 @@ export default function HomePage() {
       </div>
       
             {/* AI Models Header - Using MatchHeader for perfect alignment */}
-      <MatchHeader mode="homepage" />
+      <MatchHeader mode="homepage" fixtures={filteredFixtures} />
 
       {/* Loading and Error States */}
       {loading && (
@@ -180,7 +213,7 @@ export default function HomePage() {
                   </span>
                   <div>
                     <div className="flex items-center space-x-2">
-                      <h2 className="text-lg sm:text-xl font-semibold text-white">
+                      <h2 className="text-base sm:text-lg lg:text-lg font-semibold text-white">
                         {league}
                       </h2>
                       <button
@@ -199,7 +232,7 @@ export default function HomePage() {
                         )} />
                       </button>
                     </div>
-                    <p className="text-xs text-gray-400">{country}</p>
+                    <p className="text-xs lg:text-xs text-gray-400">{country}</p>
                   </div>
                 </div>
                 
@@ -209,7 +242,7 @@ export default function HomePage() {
               </div>
               
               {/* Matches List - Single column for horizontal cards */}
-              <div className="space-y-2">
+              <div className="space-y-2 lg:space-y-2">
                 {fixtures.map((fixture) => (
                   <MatchCard
                     key={fixture.id}
@@ -223,5 +256,6 @@ export default function HomePage() {
         )}
       </div>
     </MainLayout>
+    </>
   );
 }

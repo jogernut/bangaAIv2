@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /models/
+Allow: /markets/
+Allow: /leagues/
+Allow: /countries/
+Allow: /matches/
+
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+Sitemap: https://banga.ai/sitemap.xml

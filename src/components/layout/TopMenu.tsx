@@ -20,17 +20,17 @@ export default function TopMenu() {
   
   return (
     <div className="w-full bg-gray-900">
-      <div className="max-w-[1600px] mx-auto px-3 md:px-8 lg:px-16">
-        <header className="h-20 border-b border-gray-800">
+      <div className="max-w-[1400px] mx-auto px-3 md:px-6 lg:px-12">
+        <header className="h-16 lg:h-14 border-b border-gray-800">
           <div className="flex items-center h-full relative px-6">
             {/* Logo - Left */}
             <Link href="/" className="flex items-center py-3">
               <Image
                 src="/logo.png"
                 alt="Banga.ai Logo"
-                width={320}
-                height={80}
-                className="h-14 w-auto object-contain"
+                width={280}
+                height={70}
+                className="h-10 lg:h-12 w-auto object-contain"
               />
             </Link>
 
@@ -44,7 +44,7 @@ export default function TopMenu() {
                     key={model.name}
                     href={model.path}
                     className={cn(
-                      "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap transform hover:scale-105 min-w-[90px] text-center",
+                      "px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium transition-all duration-200 whitespace-nowrap transform hover:scale-105 min-w-[70px] text-center",
                       pathname === model.path
                         ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
                         : "text-gray-300 hover:text-white hover:bg-gray-800/80"
@@ -59,7 +59,7 @@ export default function TopMenu() {
                   href={API_CONFIG.BANGABOT_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-1 px-4 py-2 rounded-lg text-sm font-medium bg-white text-gray-900 hover:bg-gray-100 transition-colors border border-gray-300 whitespace-nowrap"
+                  className="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium bg-white text-gray-900 hover:bg-gray-100 transition-colors border border-gray-300 whitespace-nowrap"
                 >
                   <Bot className="h-4 w-4" />
                   <span>BangaBot</span>
