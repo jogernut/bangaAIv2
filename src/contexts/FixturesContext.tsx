@@ -5,7 +5,6 @@ import { Fixture } from '@/data/mock';
 import { API_CONFIG, buildApiUrl, shouldUseMockData } from '@/config/api';
 import { transformFixtureModelNames } from '@/utils/models';
 import { mockFixtures } from '@/data/mock';
-import { format } from 'date-fns';
 
 interface FixturesContextType {
   fixtures: Fixture[];
@@ -97,8 +96,8 @@ export function FixturesProvider({ children }: FixturesProviderProps) {
       console.log('📊 Number of matches received:', Array.isArray(data) ? data.length : 0);
       
       // Debug: Log all unique AI model names
-      const allModelNames = data.flatMap((match: any) => 
-        (match.modelPredictions || []).map((pred: any) => pred.aiModel?.name)
+      const allModelNames = data.flatMap((match: Fixture) => 
+        (match.modelPredictions || []).map((pred) => pred.aiModel?.name)
       ).filter(Boolean);
       const uniqueModelNames = [...new Set(allModelNames)];
       console.log('🤖 Context: Available AI models in API data:', uniqueModelNames);
@@ -141,6 +140,7 @@ export function FixturesProvider({ children }: FixturesProviderProps) {
 
   useEffect(() => {
     fetchFixtures();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
 
   return (

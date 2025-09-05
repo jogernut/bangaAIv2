@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, use, useEffect } from 'react';
+import React, { useMemo, use } from 'react';
 import { format } from 'date-fns';
 import MainLayout from '@/components/layout/MainLayout';
 import DatePicker from '@/components/ui/DatePicker';
@@ -17,7 +17,7 @@ interface LeaguePageProps {
 }
 
 export default function LeaguePage({ params }: LeaguePageProps) {
-  const { fixtures, loading, error, selectedDate, setSelectedDate } = useFixtures();
+  const { fixtures, loading, selectedDate, setSelectedDate } = useFixtures();
   
   // Unwrap the async params
   const resolvedParams = use(params);

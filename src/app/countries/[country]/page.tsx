@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { format } from 'date-fns';
 import Link from 'next/link';
 import MainLayout from '@/components/layout/MainLayout';
 import DatePicker from '@/components/ui/DatePicker';
@@ -12,13 +11,12 @@ import { getCountryFlag } from '@/utils/countries';
 import { isMatchOnDate } from '@/utils/date';
 import { useFixtures } from '@/contexts/FixturesContext';
 import { sortLeaguesByPriority } from '@/config/priorities';
-// Removed unused imports
 import { ArrowLeft, Pin, PinOff } from 'lucide-react';
 
 export default function CountryPage() {
   const params = useParams();
   const countrySlug = params.country as string;
-  const { fixtures, loading, error, selectedDate, setSelectedDate } = useFixtures();
+  const { fixtures, loading, selectedDate, setSelectedDate } = useFixtures();
   const [pinnedLeagues, setPinnedLeagues] = useState<string[]>([]);
   
   // Convert slug back to country name
@@ -34,85 +32,6 @@ export default function CountryPage() {
     }
   }, []);
 
-  // Fetch fixtures from API or use mock data
-  useEffect(() => {
-    const fetchFixtures = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // Check if we should use mock data
-        if (shouldUseMockData()) {
-          console.log('🔄 Using mock data for country page - API not configured');
-          setFixtures(mockFixtures);
-          setLoading(false);
-          return;
-        }
-
-        // Build API URL - Convert date format from yyyy-MM-dd to MM/dd/yyyy
-        const [year, month, day] = selectedDate.split('-');
-        const apiDate = `${month}/${day}/${year}`;
-        
-        const apiUrl = buildApiUrl(API_CONFIG.ENDPOINTS.HOMEPAGE, {
-          date: apiDate
-        });
-        
-        console.log('🌐 Fetching country fixtures from API:', apiUrl);
-        
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          mode: 'cors',
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.log('📡 Error response body:', errorText);
-          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        
-        // Check if response has content
-        const responseText = await response.text();
-        console.log('📡 Raw response length:', responseText.length);
-        
-        if (!responseText.trim()) {
-          throw new Error('API returned empty response');
-        }
-        
-        const data = JSON.parse(responseText);
-        console.log('✅ Country fixtures received:', data);
-        
-        // Transform API data to match our Fixture interface
-        const transformedFixtures = Array.isArray(data) ? data.map((match: any) => ({
-          ...match,
-          hometeamlogo: match.hometeamlogo || '',
-          awayteamlogo: match.awayteamlogo || '',
-          modelPredictions: (match.modelPredictions || []).map((prediction: any) => ({
-            ...prediction,
-            aiModel: {
-              ...prediction.aiModel,
-              name: prediction.aiModel?.name === 'Germini' ? 'Gemini' : prediction.aiModel?.name
-            }
-          }))
-        })) : [];
-        
-        setFixtures(transformedFixtures);
-        
-      } catch (err) {
-        console.error('❌ Country API Error:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch data');
-        // Fallback to mock data
-        setFixtures(mockFixtures);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFixtures();
-  }, [selectedDate]);
   
   // Filter fixtures by country and date
   const filteredFixtures = useMemo(() => {

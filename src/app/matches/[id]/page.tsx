@@ -83,7 +83,7 @@ export default function MatchDetailsPage() {
           awayteamlogo: data.awayteamlogo || '',
           hometeamRecentForm: data.hometeamRecentForm || 'win,win,draw,win,win',
           awayteamRecentForm: data.awayteamRecentForm || 'win,draw,win,lose,win',
-          modelPredictions: (data.modelPredictions || []).map((prediction: any) => ({
+          modelPredictions: (data.modelPredictions || []).map((prediction: Fixture['modelPredictions'][0]) => ({
             ...prediction,
             aiModel: {
               ...prediction.aiModel,

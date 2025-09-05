@@ -16,7 +16,7 @@ import { TrendingUp } from 'lucide-react';
 export default function MarketPage() {
   const params = useParams();
   const market = params.market as string;
-  const { fixtures, loading, error, selectedDate, setSelectedDate } = useFixtures();
+  const { fixtures, loading, selectedDate, setSelectedDate } = useFixtures();
   
   // Find market info
   const marketInfo = mockMarkets.find(m => m.key === market);

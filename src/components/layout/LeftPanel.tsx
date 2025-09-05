@@ -8,7 +8,7 @@ import SearchBox from '@/components/ui/SearchBox';
 import { cn } from '@/utils/cn';
 import { getCountryFlag } from '@/utils/countries';
 import { mockMarkets, getUniqueLeagues, getUniqueCountries, type Fixture } from '@/data/mock';
-import { getTopPriorityLeagues, getTopPriorityCountries, sortLeaguesByPriority, sortCountriesByPriority, MAX_PRIORITY_LEAGUES, MAX_PRIORITY_COUNTRIES } from '@/config/priorities';
+import { sortLeaguesByPriority, sortCountriesByPriority, MAX_PRIORITY_LEAGUES, MAX_PRIORITY_COUNTRIES } from '@/config/priorities';
 import { API_CONFIG } from '@/config/api';
 
 interface LeftPanelProps {

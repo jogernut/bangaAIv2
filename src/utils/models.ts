@@ -1,3 +1,17 @@
+import { Fixture } from '@/data/mock';
+
+interface ApiMatch {
+  hometeamlogo?: string;
+  awayteamlogo?: string;
+  modelPredictions?: Array<{
+    aiModel?: {
+      name?: string;
+    };
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
+}
+
 /**
  * Utility functions for AI model handling
  */
@@ -20,17 +34,17 @@ export const normalizeModelName = (modelName: string | undefined | null): string
 /**
  * Transform API fixture data to normalize model names
  */
-export const transformFixtureModelNames = (apiData: any[]): any[] => {
-  return Array.isArray(apiData) ? apiData.map((match: any) => ({
+export const transformFixtureModelNames = (apiData: ApiMatch[]): Fixture[] => {
+  return Array.isArray(apiData) ? apiData.map((match: ApiMatch) => ({
     ...match,
     hometeamlogo: match.hometeamlogo || '',
     awayteamlogo: match.awayteamlogo || '',
-    modelPredictions: (match.modelPredictions || []).map((prediction: any) => ({
+    modelPredictions: (match.modelPredictions || []).map((prediction) => ({
       ...prediction,
       aiModel: {
         ...prediction.aiModel,
         name: normalizeModelName(prediction.aiModel?.name)
       }
     }))
-  })) : [];
+  })) as Fixture[] : [];
 };

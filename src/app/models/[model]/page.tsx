@@ -15,7 +15,7 @@ import { Brain, Bot } from 'lucide-react';
 export default function ModelPage() {
   const params = useParams();
   const modelParam = params.model as string;
-  const { fixtures, loading, error, selectedDate, setSelectedDate } = useFixtures();
+  const { fixtures, loading, selectedDate, setSelectedDate } = useFixtures();
   
   // Capitalize model name for display, but ensure it matches API format
   let modelName = modelParam.charAt(0).toUpperCase() + modelParam.slice(1);
@@ -71,7 +71,7 @@ export default function ModelPage() {
     console.log(`🤖 Final fixtures with ${modelParam} predictions: ${modelFiltered.length}`);
     
     return modelFiltered;
-  }, [fixtures, selectedDate, modelParam]);
+  }, [fixtures, selectedDate, modelParam, modelName]);
   
   // Group fixtures by country and league
   const groupedFixtures = useMemo(() => {
